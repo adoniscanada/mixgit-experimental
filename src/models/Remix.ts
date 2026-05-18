@@ -9,6 +9,7 @@ const ProgramFileSchema = new mongoose.Schema(
     fileType: {
       type: String,
       required: true,
+      enum: ["image", "logic"],
     },
     data: {
       type: String,
@@ -35,7 +36,8 @@ const RemixSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      maxlength: [300, "Remix description cannot exceed 500 characters"],
+      minlength: [1, "Remix description must be atleast 1 character"],
+      maxlength: [300, "Remix description cannot exceed 300 characters"],
     },
     isMain: {
       type: Boolean,
