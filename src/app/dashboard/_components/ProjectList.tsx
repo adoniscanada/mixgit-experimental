@@ -68,9 +68,9 @@ function ProjectRow({ project }: { project: Project }) {
               <AlertDialog.Backdrop>
                 <AlertDialog.Container>
                   <AlertDialog.Dialog>
-                    <AlertDialog.CloseTrigger />
+                    <AlertDialog.CloseTrigger className="m-3" />
                     <AlertDialog.Header>
-                      <AlertDialog.Heading className="flex items-center gap-2 text-2xl">
+                      <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
                         <AlertDialog.Icon />
                         Delete Project?
                       </AlertDialog.Heading>
