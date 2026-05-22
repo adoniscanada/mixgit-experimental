@@ -9,7 +9,7 @@ const ProgramFileSchema = new mongoose.Schema(
     fileType: {
       type: String,
       required: true,
-      enum: ["image", "logic"],
+      enum: ["asset", "logic"],
     },
     data: {
       type: String,

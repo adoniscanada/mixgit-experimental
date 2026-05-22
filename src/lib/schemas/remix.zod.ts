@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const ProgramFileSchema = z.object({
   name: z.string(),
-  fileType: z.enum(["image", "logic"]),
+  fileType: z.enum(["asset", "logic"]),
   data: z.string().optional(),
   imagePath: z.string().optional(),
 });

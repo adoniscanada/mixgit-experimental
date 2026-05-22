@@ -4,6 +4,7 @@ import Project from "@/models/Project";
 import Remix from "@/models/Remix";
 import mongoose from "mongoose";
 import { notFound } from "next/navigation";
+import CreateRemixModal from "./_components/CreateRemixModal";
 
 export default async function ProjectPage({
   params,
@@ -36,7 +37,10 @@ export default async function ProjectPage({
           )}
         </div>
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Remixes</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Remixes</h2>
+            <CreateRemixModal projectId={id} />
+          </div>
           {remixes.length === 0 ? (
             <p className="text-sm text-gray-400">No remixes yet.</p>
           ) : (
