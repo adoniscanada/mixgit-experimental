@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  Avatar,
   Button,
   Card,
   Chip,
@@ -75,12 +76,17 @@ export function ProjectContent({ projectId, remixes }: Props) {
                       </Chip>
                     )}
                   </Card.Title>
-                  <Card.Description>
-                    Created {selectedRemix?.createdAt} by{" "}
-                    <Link href="#">{selectedRemix?.uploaderName}</Link>
-                  </Card.Description>
+                  <Card.Description>Created {remix.createdAt}</Card.Description>
                 </Card.Header>
-                <Card.Content>
+                <Card.Content className="flex flex-row gap-2 items-center">
+                  <Avatar>
+                    <Avatar.Fallback>
+                      {remix.uploaderName.substring(0, 2)}
+                    </Avatar.Fallback>
+                  </Avatar>
+                  <span className="truncate"> {remix.description}</span>
+                </Card.Content>
+                <Card.Footer>
                   <Button
                     variant="outline"
                     size="sm"
@@ -89,7 +95,7 @@ export function ProjectContent({ projectId, remixes }: Props) {
                     <EyeIcon />
                     View
                   </Button>
-                </Card.Content>
+                </Card.Footer>
               </Card>
             ))}
           </div>
@@ -107,7 +113,14 @@ export function ProjectContent({ projectId, remixes }: Props) {
               <Link href="#">{selectedRemix?.uploaderName}</Link>
             </Card.Description>
           </Card.Header>
-          <Card.Content>{selectedRemix?.description}</Card.Content>
+          <Card.Content className="flex flex-row gap-2 items-center">
+            <Avatar>
+              <Avatar.Fallback>
+                {selectedRemix?.uploaderName.substring(0, 2)}
+              </Avatar.Fallback>
+            </Avatar>
+            {selectedRemix?.description}
+          </Card.Content>
           <Card.Footer className="flex gap-2">
             <Button size="sm">
               <ArrowDownTrayIcon />
