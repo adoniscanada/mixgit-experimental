@@ -95,10 +95,8 @@ export function ProjectContent({ projectId, remixes }: Props) {
           <Card.Header>
             <Card.Title>About this Remix</Card.Title>
             <Card.Description>
-              <p>
-                Created {selectedRemix?.createdAt} by{" "}
-                <Link href="#">{selectedRemix?.uploaderName}</Link>
-              </p>
+              Created {selectedRemix?.createdAt} by{" "}
+              <Link href="#">{selectedRemix?.uploaderName}</Link>
             </Card.Description>
           </Card.Header>
           <Card.Content>{selectedRemix?.description}</Card.Content>
