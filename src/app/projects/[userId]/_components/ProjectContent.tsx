@@ -51,7 +51,10 @@ export function ProjectContent({ remixes }: Props) {
         className="max-w-60 shrink-0 flex flex-col gap-3 p-2"
         hideScrollBar
       >
-        <h2 className="text-lg font-semibold">Remixes</h2>
+        <div className="flex flex-row justify-between">
+          <h2 className="text-lg font-semibold">Remixes</h2>
+          <Chip>{remixes.length}</Chip>
+        </div>
         {remixes.length === 0 ? (
           <p className="text-sm text-gray-400">No remixes yet.</p>
         ) : (
@@ -65,14 +68,19 @@ export function ProjectContent({ remixes }: Props) {
               >
                 <Card.Header>
                   <Card.Title className="flex justify-between">
-                    {remix.name}
-                    {remix.isMain && (
-                      <Chip color="success" variant="primary">
-                        <Chip.Label>Main</Chip.Label>
-                      </Chip>
+                    <div className="flex gap-2">
+                      {remix.name}
+                      {remix.isMain && (
+                        <Chip size="sm">
+                          <Chip.Label>main</Chip.Label>
+                        </Chip>
+                      )}
+                    </div>
+                    {remix.id === selectedId && (
+                      <div className="w-2 h-2 rounded-full bg-green-500 self-center shrink-0" />
                     )}
                   </Card.Title>
-                  <Card.Description>Created {remix.createdAt}</Card.Description>
+                  <Card.Description>{remix.createdAt}</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-row gap-2 items-center">
                   <Avatar size="sm">
