@@ -20,7 +20,11 @@ export const auth = betterAuth({
       color: {
         type: "string",
         required: false,
-        defaultValue: null,
+        defaultValue: () =>
+          "#" +
+          Math.floor(Math.random() * 0xffffff)
+            .toString(16)
+            .padStart(6, "0"),
       },
     },
   },
