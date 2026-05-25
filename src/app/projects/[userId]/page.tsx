@@ -29,10 +29,9 @@ export default async function ProjectPage({
     _id: new mongoose.Types.ObjectId(projectId),
     creator: new mongoose.Types.ObjectId(userId),
   })
-    .populate<{ team: { _id: mongoose.Types.ObjectId; name: string }[] }>(
-      "team",
-      "name",
-    )
+    .populate<{
+      team: { _id: mongoose.Types.ObjectId; name: string; color: string }[];
+    }>("team", "name color")
     .lean();
 
   if (!project) notFound();
@@ -43,8 +42,8 @@ export default async function ProjectPage({
   const remixes = await RemixModel.find({ project: project._id })
     .sort({ createdAt: -1 })
     .populate<{
-      uploader: { _id: mongoose.Types.ObjectId; name: string };
-    }>("uploader", "name")
+      uploader: { _id: mongoose.Types.ObjectId; name: string; color: string };
+    }>("uploader", "name color")
     .lean();
 
   // serialization to RemixItem needed since ProjectContent is a client component
@@ -53,6 +52,7 @@ export default async function ProjectPage({
     id: remix._id.toString(),
     name: remix.name,
     uploaderName: remix.uploader.name,
+    uploaderColor: remix.uploader.color,
     description: remix.description,
     isMain: remix.isMain,
     projectJsonData:
@@ -67,36 +67,38 @@ export default async function ProjectPage({
   return (
     <div className="font-sans h-screen flex flex-col overflow-hidden">
       <main className="px-6 py-8 flex flex-col gap-6 flex-1 min-h-0">
-        <div className="flex flex-row gap-2 justify-between">
-          <BackButton href="/dashboard" />
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-bold">{project.name}</h1>
-            {project.description && (
-              <p className="text-sm text-gray-400">{project.description}</p>
-            )}
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-row gap-6">
+            <BackButton href="/dashboard" />
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold">{project.name}</h1>
+              {project.description && (
+                <p className="text-sm text-gray-400">{project.description}</p>
+              )}
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex flex-row">
               {project.team.map((member) => (
-                <Avatar
-                  key={member._id.toString()}
-                  className="-mr-4 border-2 border-white"
-                >
-                  <Avatar.Fallback>
-                    {member.name.substring(0, 2)}
+                <Avatar key={member._id.toString()} className="-mr-4 border-2">
+                  <Avatar.Fallback style={{ backgroundColor: member.color }}>
+                    {member.name.substring(0, 2).toUpperCase()}
                   </Avatar.Fallback>
                 </Avatar>
               ))}
-              <Avatar className="border-2 border-white">
-                <Avatar.Fallback>
-                  {creator?.name?.substring(0, 2)}
+              <Avatar className="border-2">
+                <Avatar.Fallback style={{ backgroundColor: creator?.color }}>
+                  {creator?.name?.substring(0, 2).toUpperCase()}
                 </Avatar.Fallback>
               </Avatar>
               <span className="ml-2">
                 <AddCollaboratorModal projectId={project._id.toString()} />
               </span>
             </div>
-            <CreateRemixModal projectId={project._id.toString()} />
+            <CreateRemixModal
+              projectId={project._id.toString()}
+              creatorId={userId}
+            />
           </div>
         </div>
         <Separator></Separator>

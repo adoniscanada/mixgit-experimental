@@ -28,7 +28,13 @@ function SubmitButton({ isPending }: { isPending?: boolean }) {
   );
 }
 
-export default function CreateRemixModal({ projectId }: { projectId: string }) {
+export default function CreateRemixModal({
+  projectId,
+  creatorId,
+}: {
+  projectId: string;
+  creatorId: string;
+}) {
   const state = useOverlayState();
   const router = useRouter();
   const [name, setName] = useState("");
@@ -48,7 +54,7 @@ export default function CreateRemixModal({ projectId }: { projectId: string }) {
       const res = await fetch(`/api/projects/${projectId}/remixes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, projectData }),
+        body: JSON.stringify({ name, description, projectData, creatorId }),
       });
 
       if (res.ok) {

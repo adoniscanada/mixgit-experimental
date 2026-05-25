@@ -24,16 +24,34 @@ export async function POST(
     const session = await verifySession();
     await connectDB();
 
+    const body = await request.json();
+
+    const creatorId = body.creatorId;
+    if (!creatorId) {
+      return NextResponse.json(
+        { error: "Creator ID is required" },
+        { status: 400 },
+      );
+    }
+
     const project = await ProjectModel.findOne({
       _id: new mongoose.Types.ObjectId(id),
-      creator: new mongoose.Types.ObjectId(session.userId),
+      creator: new mongoose.Types.ObjectId(creatorId),
     });
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const isAuthorized =
+      project.creator.equals(session.userId) ||
+      project.team.some((memberId: mongoose.Types.ObjectId) =>
+        memberId.equals(session.userId),
+      );
+
+    if (!isAuthorized) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const result = RemixSchema.omit({
       project: true,

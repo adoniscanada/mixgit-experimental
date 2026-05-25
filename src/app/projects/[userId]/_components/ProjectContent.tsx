@@ -19,6 +19,7 @@ export type RemixItem = {
   id: string;
   name: string;
   uploaderName: string;
+  uploaderColor: string;
   description: string;
   isMain: boolean;
   projectJsonData: string;
@@ -47,7 +48,7 @@ export function ProjectContent({ remixes }: Props) {
   return (
     <div className="flex gap-6 flex-1 min-h-0">
       <ScrollShadow
-        className="w-100 shrink-0 flex flex-col gap-3 p-2"
+        className="max-w-60 shrink-0 flex flex-col gap-3 p-2"
         hideScrollBar
       >
         <h2 className="text-lg font-semibold">Remixes</h2>
@@ -74,12 +75,14 @@ export function ProjectContent({ remixes }: Props) {
                   <Card.Description>Created {remix.createdAt}</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-row gap-2 items-center">
-                  <Avatar>
-                    <Avatar.Fallback>
-                      {remix.uploaderName.substring(0, 2)}
+                  <Avatar size="sm">
+                    <Avatar.Fallback
+                      style={{ backgroundColor: remix.uploaderColor }}
+                    >
+                      {remix.uploaderName.substring(0, 2).toUpperCase()}
                     </Avatar.Fallback>
                   </Avatar>
-                  <span className="truncate"> {remix.description}</span>
+                  <span className="truncate text-sm"> {remix.description}</span>
                 </Card.Content>
                 <Card.Footer>
                   <Button
@@ -111,13 +114,10 @@ export function ProjectContent({ remixes }: Props) {
               </Link>
             </Card.Description>
           </Card.Header>
-          <Card.Content className="flex flex-row gap-2 items-center">
-            <Avatar>
-              <Avatar.Fallback>
-                {selectedRemix?.uploaderName.substring(0, 2)}
-              </Avatar.Fallback>
-            </Avatar>
-            {selectedRemix?.description}
+          <Card.Content className="">
+            <ScrollShadow className="h-[60px]">
+              {selectedRemix?.description}
+            </ScrollShadow>
           </Card.Content>
           <Card.Footer className="flex gap-2">
             <Button size="sm">
