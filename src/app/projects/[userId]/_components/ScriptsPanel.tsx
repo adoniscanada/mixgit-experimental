@@ -16,7 +16,9 @@ export function ScriptsPanel({ scripts }: Props) {
 
   if (Object.keys(scripts).length === 0) {
     return (
-      <p className="text-sm italic text-gray-400">No scripts available.</p>
+      <div className="flex flex-col gap-4 flex-1 min-h-0">
+        <p className="text-sm italic text-gray-400">No scripts available.</p>
+      </div>
     );
   }
 

@@ -6,7 +6,7 @@ import UserModel from "@/models/User";
 import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
-import { Avatar, Separator } from "@heroui/react";
+import { Avatar, Chip, Separator } from "@heroui/react";
 import CreateRemixModal from "./_components/CreateRemixModal";
 import { BackButton } from "../../../components/BackButton";
 import AddCollaboratorModal from "./_components/AddCollaboratorModal";
@@ -57,10 +57,12 @@ export default async function ProjectPage({
     isMain: remix.isMain,
     projectJsonData:
       remix.files.find((f: IProgramFile) => f.fileType === "logic")?.data ?? "",
-    createdAt: remix.createdAt.toLocaleDateString("en-US", {
+    createdAt: remix.createdAt.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     }),
   }));
 
@@ -75,6 +77,30 @@ export default async function ProjectPage({
               {project.description && (
                 <p className="text-sm text-gray-400">{project.description}</p>
               )}
+              <div className="flex flex-row gap-2 my-2">
+                <Chip>
+                  Created:{" "}
+                  {project.createdAt.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </Chip>
+                {remixes[0] ? (
+                  <Chip>
+                    Updated:{" "}
+                    {remixes[0].createdAt.toLocaleString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </Chip>
+                ) : (
+                  <></>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
