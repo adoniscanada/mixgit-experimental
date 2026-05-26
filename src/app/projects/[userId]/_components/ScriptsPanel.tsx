@@ -40,6 +40,7 @@ export function ScriptsPanel({ scripts }: Props) {
             {Object.keys(scripts).map((name) => (
               <ListBox.Item key={name} textValue={name}>
                 {name}
+                <ListBox.ItemIndicator />
               </ListBox.Item>
             ))}
           </ListBox>
