@@ -24,7 +24,6 @@ export function proxy(request: NextRequest) {
 
   const isAuthenticated = !!sessionCookie;
 
-  // !!! change to /login once that page is made
   if (isProtectedRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
