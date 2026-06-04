@@ -64,7 +64,7 @@ export function ProjectHeader({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row">
+        <div className="flex flex-row justify-end">
           {team.map((member) => (
             <Avatar key={member.id} className="-mr-4 border-2 border-white">
               <Avatar.Fallback style={{ backgroundColor: member.color }}>
@@ -77,9 +77,11 @@ export function ProjectHeader({
               {creatorName.substring(0, 2).toUpperCase()}
             </Avatar.Fallback>
           </Avatar>
-          <span className="ml-2">
-            <AddCollaboratorModal projectId={projectId} />
-          </span>
+          {userId === creatorId && (
+            <span className="ml-2">
+              <AddCollaboratorModal projectId={projectId} />
+            </span>
+          )}
         </div>
         <CreateRemixModal projectId={projectId} creatorId={creatorId} />
       </div>
