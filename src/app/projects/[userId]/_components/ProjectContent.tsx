@@ -24,6 +24,7 @@ export type RemixItem = {
   id: string;
   name: string;
   uploaderName: string;
+  uploaderId: string;
   uploaderColor: string;
   description: string;
   isMain: boolean;
@@ -32,10 +33,12 @@ export type RemixItem = {
 };
 
 interface Props {
+  creatorId: string;
+  userId: string;
   remixes: RemixItem[];
 }
 
-export function ProjectContent({ remixes }: Props) {
+export function ProjectContent({ creatorId, userId, remixes }: Props) {
   const defaultId = (remixes.find((r) => r.isMain) ?? remixes[0])?.id ?? null;
   const [selectedId, setSelectedId] = useState<string | null>(defaultId);
   const [aiFeedback, setAiFeedback] = useState<string | null>(null);
@@ -231,54 +234,63 @@ export function ProjectContent({ remixes }: Props) {
                   <ArrowDownTrayIcon />
                   Download
                 </Button>
+                {(userId === creatorId ||
+                  userId === selectedRemix.uploaderId) && (
+                  <AlertDialog
+                    isOpen={deleteState.isOpen}
+                    onOpenChange={deleteState.setOpen}
+                  >
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onPress={deleteState.open}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                      Delete
+                    </Button>
 
-                <AlertDialog
-                  isOpen={deleteState.isOpen}
-                  onOpenChange={deleteState.setOpen}
-                >
-                  <Button variant="danger" size="sm" onPress={deleteState.open}>
-                    <TrashIcon className="h-4 w-4" />
-                    Delete
-                  </Button>
+                    <AlertDialog.Backdrop>
+                      <AlertDialog.Container>
+                        <AlertDialog.Dialog>
+                          <AlertDialog.CloseTrigger className="m-3" />
 
-                  <AlertDialog.Backdrop>
-                    <AlertDialog.Container>
-                      <AlertDialog.Dialog>
-                        <AlertDialog.CloseTrigger className="m-3" />
+                          <AlertDialog.Header>
+                            <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                              <AlertDialog.Icon />
+                              Delete Remix?
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
 
-                        <AlertDialog.Header>
-                          <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
-                            <AlertDialog.Icon />
-                            Delete Remix?
-                          </AlertDialog.Heading>
-                        </AlertDialog.Header>
+                          <AlertDialog.Body>
+                            <strong>{selectedRemix.name}</strong> will be
+                            permanently deleted. This cannot be undone.
+                          </AlertDialog.Body>
 
-                        <AlertDialog.Body>
-                          <strong>{selectedRemix.name}</strong> will be
-                          permanently deleted. This cannot be undone.
-                        </AlertDialog.Body>
+                          <AlertDialog.Footer>
+                            <Button
+                              variant="outline"
+                              onPress={deleteState.close}
+                            >
+                              Cancel
+                            </Button>
 
-                        <AlertDialog.Footer>
-                          <Button variant="outline" onPress={deleteState.close}>
-                            Cancel
-                          </Button>
-
-                          <Button
-                            variant="danger"
-                            isDisabled={loading}
-                            onPress={async () => {
-                              await handleDeleteRemix();
-                              deleteState.close();
-                            }}
-                          >
-                            {loading && <Spinner size="sm" />}
-                            {loading ? "Deleting..." : "Delete"}
-                          </Button>
-                        </AlertDialog.Footer>
-                      </AlertDialog.Dialog>
-                    </AlertDialog.Container>
-                  </AlertDialog.Backdrop>
-                </AlertDialog>
+                            <Button
+                              variant="danger"
+                              isDisabled={loading}
+                              onPress={async () => {
+                                await handleDeleteRemix();
+                                deleteState.close();
+                              }}
+                            >
+                              {loading && <Spinner size="sm" />}
+                              {loading ? "Deleting..." : "Delete"}
+                            </Button>
+                          </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                      </AlertDialog.Container>
+                    </AlertDialog.Backdrop>
+                  </AlertDialog>
+                )}
               </div>
             </Card.Content>
           </Card>

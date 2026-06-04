@@ -62,6 +62,7 @@ export default async function ProjectPage({
     id: remix._id.toString(),
     name: remix.name,
     uploaderName: remix.uploader.name,
+    uploaderId: remix.uploader._id.toString(),
     uploaderColor: remix.uploader.color,
     description: remix.description,
     isMain: remix.isMain,
@@ -94,7 +95,11 @@ export default async function ProjectPage({
           creatorColor={creator?.color ?? ""}
         />
         <Separator></Separator>
-        <ProjectContent remixes={serializedRemixes} />
+        <ProjectContent
+          creatorId={userId}
+          userId={session.userId}
+          remixes={serializedRemixes}
+        />
       </main>
     </div>
   );
