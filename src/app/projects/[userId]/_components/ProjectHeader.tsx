@@ -64,6 +64,7 @@ export function ProjectHeader({
       .filter((m) => m.id !== creatorId)
       .sort((a) => (a.id === userId ? -1 : 0)),
   ];
+  const isVisitor = !sortedTeam.some((m) => m.id === userId);
 
   async function handleLeaveProject() {
     setLoading(true);
@@ -75,8 +76,8 @@ export function ProjectHeader({
   }
 
   return (
-    <Surface className="flex flex-row justify-between rounded-3xl p-6">
-      <div className="flex flex-row flex-1 gap-6">
+    <Surface className="flex justify-between rounded-3xl p-4">
+      <div className="flex flex-1 gap-6">
         <div className="flex flex-col flex-1">
           <Input
             value={name}
@@ -96,8 +97,8 @@ export function ProjectHeader({
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-end gap-1">
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-end gap-2">
           <div className="flex -space-x-2">
             {sortedTeam.slice(0, 3).map((member) => (
               <Link
@@ -146,66 +147,79 @@ export function ProjectHeader({
               </Dropdown>
             )}
           </div>
-          {userId === creatorId && (
-            <AddCollaboratorModal projectId={projectId} />
-          )}
-          <AlertDialog
-            isOpen={leaveState.isOpen}
-            onOpenChange={leaveState.setOpen}
-          >
-            <Tooltip>
-              <Button
-                variant="danger-soft"
-                isIconOnly
-                isDisabled={!team.some((m) => m.id === userId)}
-                onPress={leaveState.open}
+          {!isVisitor && (
+            <div className="flex gap-1">
+              <AddCollaboratorModal
+                projectId={projectId}
+                isDisabled={userId !== creatorId}
+              />
+
+              <AlertDialog
+                isOpen={leaveState.isOpen}
+                onOpenChange={leaveState.setOpen}
               >
-                <UserMinusIcon />
-              </Button>
-              <Tooltip.Content>
-                <p>Leave project</p>
-              </Tooltip.Content>
-            </Tooltip>
+                <Tooltip>
+                  <Button
+                    variant="danger-soft"
+                    isIconOnly
+                    onPress={leaveState.open}
+                  >
+                    <UserMinusIcon />
+                  </Button>
+                  <Tooltip.Content>
+                    <p>Leave project</p>
+                  </Tooltip.Content>
+                </Tooltip>
 
-            <AlertDialog.Backdrop>
-              <AlertDialog.Container>
-                <AlertDialog.Dialog>
-                  <AlertDialog.CloseTrigger className="m-3" />
+                <AlertDialog.Backdrop>
+                  <AlertDialog.Container>
+                    <AlertDialog.Dialog>
+                      <AlertDialog.CloseTrigger className="m-3" />
 
-                  <AlertDialog.Header>
-                    <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
-                      <AlertDialog.Icon />
-                      Leave Project?
-                    </AlertDialog.Heading>
-                  </AlertDialog.Header>
+                      <AlertDialog.Header>
+                        <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                          <AlertDialog.Icon />
+                          Leave Project?
+                        </AlertDialog.Heading>
+                      </AlertDialog.Header>
 
-                  <AlertDialog.Body>
-                    You will no longer be able to contribute to this project.
-                    {leaveError && (
-                      <p className="text-red-500 text-sm mt-2">{leaveError}</p>
-                    )}
-                  </AlertDialog.Body>
+                      <AlertDialog.Body>
+                        You will no longer be able to contribute to this
+                        project.
+                        {leaveError && (
+                          <p className="text-red-500 text-sm mt-2">
+                            {leaveError}
+                          </p>
+                        )}
+                      </AlertDialog.Body>
 
-                  <AlertDialog.Footer>
-                    <Button variant="outline" onPress={leaveState.close}>
-                      Cancel
-                    </Button>
+                      <AlertDialog.Footer>
+                        <Button variant="outline" onPress={leaveState.close}>
+                          Cancel
+                        </Button>
 
-                    <Button
-                      variant="danger"
-                      isDisabled={loading}
-                      onPress={handleLeaveProject}
-                    >
-                      {loading && <Spinner size="sm" />}
-                      {loading ? "Leaving..." : "Leave"}
-                    </Button>
-                  </AlertDialog.Footer>
-                </AlertDialog.Dialog>
-              </AlertDialog.Container>
-            </AlertDialog.Backdrop>
-          </AlertDialog>
+                        <Button
+                          variant="danger"
+                          isDisabled={loading}
+                          onPress={handleLeaveProject}
+                        >
+                          {loading && <Spinner size="sm" />}
+                          {loading ? "Leaving..." : "Leave"}
+                        </Button>
+                      </AlertDialog.Footer>
+                    </AlertDialog.Dialog>
+                  </AlertDialog.Container>
+                </AlertDialog.Backdrop>
+              </AlertDialog>
+            </div>
+          )}
         </div>
-        <CreateRemixModal projectId={projectId} creatorId={creatorId} />
+        {!isVisitor && (
+          <CreateRemixModal
+            projectId={projectId}
+            creatorId={creatorId}
+          ></CreateRemixModal>
+        )}
       </div>
     </Surface>
   );

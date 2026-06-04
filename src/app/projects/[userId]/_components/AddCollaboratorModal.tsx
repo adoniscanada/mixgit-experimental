@@ -25,11 +25,12 @@ function SubmitButton({ isPending }: { isPending?: boolean }) {
   );
 }
 
-export default function AddCollaboratorModal({
-  projectId,
-}: {
+interface Props {
   projectId: string;
-}) {
+  isDisabled: boolean;
+}
+
+export default function AddCollaboratorModal({ projectId, isDisabled }: Props) {
   const state = useOverlayState();
   const [username, setUsername] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -51,7 +52,7 @@ export default function AddCollaboratorModal({
   return (
     <Modal state={state}>
       <Tooltip>
-        <Button variant="ghost" isIconOnly>
+        <Button variant="outline" isIconOnly isDisabled={isDisabled}>
           <UserPlusIcon />
         </Button>
         <Tooltip.Content>
