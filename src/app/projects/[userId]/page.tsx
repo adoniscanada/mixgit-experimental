@@ -31,7 +31,7 @@ export default async function ProjectPage({
   const { userId } = await params;
   const { projectId } = await searchParams;
 
-  await verifySession();
+  const session = await verifySession();
   await connectDB();
 
   // populate the "name" field from each User object in team for displaying Avatars
@@ -76,6 +76,7 @@ export default async function ProjectPage({
         <ProjectHeader
           projectId={project._id.toString()}
           creatorId={userId}
+          userId={session.userId}
           initialName={project.name}
           initialDescription={project.description ?? ""}
           createdAt={project.createdAt.toLocaleDateString("en-US", {

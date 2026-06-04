@@ -15,6 +15,7 @@ interface TeamMember {
 interface ProjectHeaderProps {
   projectId: string;
   creatorId: string;
+  userId: string;
   initialName: string;
   initialDescription: string;
   createdAt: string;
@@ -27,6 +28,7 @@ interface ProjectHeaderProps {
 export function ProjectHeader({
   projectId,
   creatorId,
+  userId,
   initialName,
   initialDescription,
   createdAt,
@@ -45,11 +47,13 @@ export function ProjectHeader({
         <div className="flex flex-col flex-1">
           <Input
             value={name}
+            readOnly={userId !== creatorId}
             onChange={(e) => setName(e.target.value)}
             className="border-none shadow-none rounded-none text-2xl font-bold m-1 p-1"
           />
           <TextArea
             value={description}
+            readOnly={userId !== creatorId}
             onChange={(e) => setDescription(e.target.value)}
             className="border-none shadow-none rounded-none text-sm m-1 p-1 max-h-18"
           />
