@@ -88,7 +88,7 @@ export function ProjectHeader({
             value={description}
             readOnly={userId !== creatorId}
             onChange={(e) => setDescription(e.target.value)}
-            className="border-none shadow-none rounded-none text-sm m-1 p-1 max-h-18"
+            className="resize-none border-none shadow-none rounded-none text-sm m-1 p-1 max-h-18"
           />
           <div className="flex flex-row gap-2 my-2">
             <Chip>Created: {createdAt}</Chip>
@@ -157,6 +157,7 @@ export function ProjectHeader({
               <Button
                 variant="danger-soft"
                 isIconOnly
+                isDisabled={!team.some((m) => m.id === userId)}
                 onPress={leaveState.open}
               >
                 <UserMinusIcon />
