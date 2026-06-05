@@ -85,7 +85,7 @@ export default async function ProjectPage({
             day: "numeric",
             year: "numeric",
           })}
-          lastUpdated={serializedRemixes[0]?.createdAt}
+          lastUpdated={formatTimestamp(project.updatedAt)}
           team={project.team.map((m) => ({
             id: m._id.toString(),
             name: m.name,

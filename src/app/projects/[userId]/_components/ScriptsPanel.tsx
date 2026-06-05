@@ -175,7 +175,7 @@ export function ScriptsPanel({
           {raw}
         </Surface>
       ) : (
-        <Surface className="flex flex-wrap gap-3 p-3 justify-around flex-1 min-h-0 overflow-auto bg-grid border rounded-lg">
+        <Surface className="flex flex-wrap gap-3 p-3 justify-around flex-1 min-h-0 overflow-auto bg-grid bg-local border rounded-lg">
           {targetScripts.map((script) => (
             <ScriptStack key={script.hatBlockId} script={script} />
           ))}

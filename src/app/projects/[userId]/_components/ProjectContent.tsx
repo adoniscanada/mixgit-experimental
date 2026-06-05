@@ -191,7 +191,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                   </Card.Header>
                 </div>
                 <Card.Content>
-                  <p className="text-xs truncate">{remix.description}</p>
+                  <p className="text-sm truncate">{remix.description}</p>
                 </Card.Content>
               </Card>
             ))}
@@ -216,7 +216,8 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
             <Card.Header>
               <Card.Title>About this Remix</Card.Title>
               <Card.Description>
-                {selectedRemix.name} created {selectedRemix.createdAt} by{" "}
+                <strong>{selectedRemix.name} </strong>created{" "}
+                {selectedRemix.createdAt} by{" "}
                 <Link
                   target="_blank"
                   href={`/users/${selectedRemix.uploaderId}`}

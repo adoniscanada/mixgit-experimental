@@ -91,7 +91,7 @@ export function ProjectHeader({
             onChange={(e) => setDescription(e.target.value)}
             className="resize-none border-none shadow-none rounded-sm text-sm p-1"
           />
-          <div className="flex flex-row gap-2 my-2">
+          <div className="flex flex-row gap-1">
             <Chip size="sm">
               <Chip.Label>Created: {createdAt}</Chip.Label>
             </Chip>
@@ -103,7 +103,7 @@ export function ProjectHeader({
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col justify-between">
         <div className="flex justify-end gap-2">
           <div className="flex -space-x-2">
             {sortedTeam.slice(0, 3).map((member) => (
