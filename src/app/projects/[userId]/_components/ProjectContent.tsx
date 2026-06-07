@@ -3,14 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge, Popover, ToggleButton } from "@heroui/react";
-import {
-  Avatar,
-  Card,
-  Chip,
-  ScrollShadow,
-  Separator,
-  Link,
-} from "@heroui/react";
+import { Avatar, Card, Chip, ScrollShadow, Link } from "@heroui/react";
 import { parseScripts } from "@/lib/scratch";
 import { ScriptsPanel } from "./ScriptsPanel";
 import { StarIcon } from "@heroicons/react/16/solid";
@@ -94,16 +87,15 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       throw new Error(
         typeof data.error === "string" ? data.error : "Failed to delete remix",
       );
+    } else {
+      setSelectedId(defaultId);
     }
     router.refresh();
   }
 
   return (
     <div className="flex gap-6 flex-1 min-h-0">
-      <ScrollShadow
-        className="w-xs shrink-0 flex flex-col gap-3 p-2"
-        hideScrollBar
-      >
+      <ScrollShadow className="w-xs shrink-0 flex flex-col gap-3 p-2">
         <div className="flex justify-between">
           <h2 className="text-lg font-semibold">Remixes</h2>
           <Chip>{remixes.length}</Chip>
@@ -113,9 +105,12 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
         ) : (
           <div className="flex flex-col gap-2">
             {remixes.map((remix) => (
-              <Card key={remix.id}>
+              <Card
+                key={remix.id}
+                variant={userId === remix.uploaderId ? "secondary" : "default"}
+              >
                 <div className="flex flex-row items-center gap-1">
-                  <Avatar size="sm">
+                  <Avatar size="sm" className="ring-2 ring-white">
                     <Avatar.Fallback
                       className="select-none"
                       style={{ backgroundColor: remix.uploaderColor }}
@@ -125,7 +120,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                   </Avatar>
                   <Card.Header className="flex flex-row flex-1 items-center justify-between">
                     <Badge.Anchor>
-                      <Card.Title className="flex gap-1">
+                      <Card.Title className="flex gap-2">
                         <ToggleButton
                           size="sm"
                           variant="ghost"
@@ -175,26 +170,27 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
           </div>
         )}
       </ScrollShadow>
-      <Separator orientation="vertical"></Separator>
-      <div className="flex flex-1 flex-col min-w-0 gap-3 p-2">
-        <ScriptsPanel
-          raw={selectedRemix?.projectJsonData}
-          scripts={scripts}
-          aiFeedback={aiFeedback}
-          loadingFeedback={loadingFeedback}
-          onGetFeedback={handleGetFeedback}
-          onDeleteRemix={handleDeleteRemix}
-          hasSelectedRemix={selectedRemix !== null}
-          remixName={selectedRemix?.name ?? null}
-          remixDescription={selectedRemix?.description ?? null}
-          feedbackTimestamp={feedbackTimestamp}
-          canDelete={
-            selectedRemix !== null &&
-            (userId === creatorId || userId === selectedRemix.uploaderId)
-          }
-        />
+      <div className="flex flex-1 flex-col justify-end min-w-0 gap-3 p-2">
+        <div className="hidden [@media(min-height:500px)]:flex flex-col flex-1 min-h-0">
+          <ScriptsPanel
+            raw={selectedRemix?.projectJsonData}
+            scripts={scripts}
+            aiFeedback={aiFeedback}
+            loadingFeedback={loadingFeedback}
+            onGetFeedback={handleGetFeedback}
+            onDeleteRemix={handleDeleteRemix}
+            hasSelectedRemix={selectedRemix !== null}
+            remixName={selectedRemix?.name ?? null}
+            remixDescription={selectedRemix?.description ?? null}
+            feedbackTimestamp={feedbackTimestamp}
+            canDelete={
+              selectedRemix !== null &&
+              (userId === creatorId || userId === selectedRemix.uploaderId)
+            }
+          />
+        </div>
         {selectedRemix && (
-          <Card variant="secondary">
+          <Card variant="tertiary">
             <Card.Header>
               <Card.Title>About this Remix</Card.Title>
               <Card.Description>

@@ -82,14 +82,7 @@ export function ScriptsPanel({
 
   return (
     <div className="flex flex-col gap-4 flex-1 min-h-0">
-      <div className="flex gap-2">
-        <ToggleButton
-          isSelected={isEmpty || isRawToggled}
-          onChange={setIsRawToggled}
-          isDisabled={isEmpty}
-        >
-          Raw
-        </ToggleButton>
+      <div className="flex gap-1 items-end">
         {hasSelectedRemix && (
           <Modal>
             <Modal.Trigger>
@@ -173,8 +166,19 @@ export function ScriptsPanel({
             </Modal.Backdrop>
           </Modal>
         )}
+        <ToggleButton
+          isSelected={isEmpty || isRawToggled}
+          onChange={setIsRawToggled}
+          isDisabled={isEmpty}
+          size="sm"
+          className="ml-auto"
+        >
+          Raw
+        </ToggleButton>
         {raw && (
           <Button
+            variant="secondary"
+            size="sm"
             onPress={() => {
               const blob = new Blob([raw], {
                 type: "application/json",
@@ -201,7 +205,8 @@ export function ScriptsPanel({
             onOpenChange={deleteState.setOpen}
           >
             <Button
-              variant="danger"
+              variant="danger-soft"
+              size="sm"
               onPress={deleteState.open}
               isDisabled={!canDelete}
             >
@@ -251,7 +256,7 @@ export function ScriptsPanel({
       </div>
       {isEmpty || isRawToggled ? (
         <Surface className="flex flex-wrap flex-1 overflow-auto whitespace-pre-wrap p-3 min-h-0 border rounded-lg">
-          {raw}
+          <code className="text-sm">{raw}</code>
         </Surface>
       ) : (
         <Surface className="flex-1 min-h-0 bg-grid bg-local border rounded-lg overflow-auto">

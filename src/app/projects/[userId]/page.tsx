@@ -6,7 +6,6 @@ import UserModel from "@/models/User";
 import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
-import { Separator } from "@heroui/react";
 import { ProjectHeader } from "./_components/ProjectHeader";
 
 function formatTimestamp(date: Date): string {
@@ -94,7 +93,6 @@ export default async function ProjectPage({
           creatorName={creator?.name ?? ""}
           creatorColor={creator?.color ?? ""}
         />
-        <Separator></Separator>
         <ProjectContent
           creatorId={userId}
           userId={session.userId}

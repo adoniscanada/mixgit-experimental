@@ -5,10 +5,11 @@ import {
   AlertDialog,
   Avatar,
   Button,
-  Chip,
+  ButtonGroup,
   Dropdown,
   Header,
   Input,
+  Popover,
   Spinner,
   Surface,
   TextArea,
@@ -17,7 +18,10 @@ import {
 } from "@heroui/react";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
-import { UserMinusIcon } from "@heroicons/react/24/outline";
+import {
+  InformationCircleIcon,
+  UserMinusIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 interface TeamMember {
@@ -77,35 +81,25 @@ export function ProjectHeader({
   }
 
   return (
-    <Surface className="flex gap-2 rounded-3xl p-4">
+    <Surface className="flex gap-2" variant="transparent">
       <div className="flex flex-1">
         <div className="flex flex-col flex-1 gap-1">
           <Input
             value={name}
             readOnly={userId !== creatorId}
             onChange={(e) => setName(e.target.value)}
-            className="border-none shadow-none rounded-sm text-2xl font-bold p-1"
+            className="bg-transparent border-none shadow-none rounded-sm text-2xl font-bold p-1"
           />
           <TextArea
             value={description}
             readOnly={userId !== creatorId}
             onChange={(e) => setDescription(e.target.value)}
-            className="resize-none border-none shadow-none rounded-sm text-sm p-1"
+            className="resize-none bg-transparent border-none shadow-none rounded-sm text-sm p-1"
           />
-          <div className="flex flex-row gap-1">
-            <Chip size="sm">
-              <Chip.Label>Created: {createdAt}</Chip.Label>
-            </Chip>
-            <Chip size="sm">
-              <Chip.Label>
-                Updated: {lastUpdated ? lastUpdated : "never"}
-              </Chip.Label>
-            </Chip>
-          </div>
         </div>
       </div>
-      <div className="flex flex-col justify-between">
-        <div className="flex justify-end gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-end items-end gap-2">
           <div className="flex -space-x-2">
             {sortedTeam.slice(0, 3).map((member) => (
               <Link
@@ -117,6 +111,7 @@ export function ProjectHeader({
                   <Tooltip.Trigger>
                     <Avatar className="ring-2 ring-white">
                       <Avatar.Fallback
+                        className="select-none"
                         style={{ backgroundColor: member.color }}
                       >
                         {member.name.substring(0, 2).toUpperCase()}
@@ -133,7 +128,7 @@ export function ProjectHeader({
               <Dropdown>
                 <Dropdown.Trigger>
                   <Avatar className="ring-2 ring-white">
-                    <Avatar.Fallback className="text-xs">
+                    <Avatar.Fallback className="text-xs select-none">
                       +{sortedTeam.length - 3}
                     </Avatar.Fallback>
                   </Avatar>
@@ -141,7 +136,7 @@ export function ProjectHeader({
                 <Dropdown.Popover>
                   <Dropdown.Menu>
                     <Dropdown.Section>
-                      <Header>Members</Header>
+                      <Header>Other Members</Header>
                       {sortedTeam.slice(3).map((member) => (
                         <Dropdown.Item
                           key={member.id}
@@ -157,29 +152,47 @@ export function ProjectHeader({
               </Dropdown>
             )}
           </div>
-          {!isVisitor && (
-            <div className="flex gap-1">
+          <Popover>
+            <Popover.Trigger className="self-start">
+              <InformationCircleIcon className="w-4 h-4" />
+            </Popover.Trigger>
+            <Popover.Content>
+              <Popover.Dialog>
+                <Popover.Arrow />
+                <Popover.Heading>About this Project</Popover.Heading>
+                <p className="text-xs text-muted mt-1">
+                  Created by <strong>{creatorName}</strong> on {createdAt}.{" "}
+                  <br />
+                  Updated {lastUpdated}.
+                </p>
+              </Popover.Dialog>
+            </Popover.Content>
+          </Popover>
+        </div>
+        {!isVisitor && (
+          <div className="flex gap-1">
+            <CreateRemixModal
+              projectId={projectId}
+              creatorId={creatorId}
+            ></CreateRemixModal>
+            <ButtonGroup>
               <AddCollaboratorModal
                 projectId={projectId}
                 isDisabled={userId !== creatorId}
               />
-
               <AlertDialog
                 isOpen={leaveState.isOpen}
                 onOpenChange={leaveState.setOpen}
               >
-                <Tooltip>
-                  <Button
-                    variant="danger-soft"
-                    isIconOnly
-                    onPress={leaveState.open}
-                  >
-                    <UserMinusIcon />
-                  </Button>
-                  <Tooltip.Content>
-                    <p>Leave project</p>
-                  </Tooltip.Content>
-                </Tooltip>
+                <Button
+                  isIconOnly
+                  onPress={leaveState.open}
+                  variant="secondary"
+                  size="sm"
+                >
+                  <ButtonGroup.Separator />
+                  <UserMinusIcon />
+                </Button>
 
                 <AlertDialog.Backdrop>
                   <AlertDialog.Container>
@@ -230,14 +243,8 @@ export function ProjectHeader({
                   </AlertDialog.Container>
                 </AlertDialog.Backdrop>
               </AlertDialog>
-            </div>
-          )}
-        </div>
-        {!isVisitor && (
-          <CreateRemixModal
-            projectId={projectId}
-            creatorId={creatorId}
-          ></CreateRemixModal>
+            </ButtonGroup>
+          </div>
         )}
       </div>
     </Surface>

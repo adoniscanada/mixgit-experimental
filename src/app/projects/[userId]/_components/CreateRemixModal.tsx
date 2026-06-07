@@ -94,11 +94,11 @@ export default function CreateRemixModal({
 
   return (
     <Modal state={state}>
-      <Button className="self-end">
+      <Button>
         <PlusIcon />
-        Upload a Remix
+        Remix
       </Button>
-      <Modal.Backdrop variant="blur">
+      <Modal.Backdrop>
         <Modal.Container>
           <Modal.Dialog>
             <Modal.CloseTrigger />

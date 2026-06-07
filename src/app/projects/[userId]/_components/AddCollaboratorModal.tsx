@@ -51,15 +51,10 @@ export default function AddCollaboratorModal({ projectId, isDisabled }: Props) {
 
   return (
     <Modal state={state}>
-      <Tooltip>
-        <Button variant="outline" isIconOnly isDisabled={isDisabled}>
-          <UserPlusIcon />
-        </Button>
-        <Tooltip.Content>
-          <p>Add collaborator</p>
-        </Tooltip.Content>
-      </Tooltip>
-      <Modal.Backdrop variant="blur">
+      <Button isIconOnly isDisabled={isDisabled} variant="secondary" size="sm">
+        <UserPlusIcon />
+      </Button>
+      <Modal.Backdrop>
         <Modal.Container>
           <Modal.Dialog>
             <Modal.CloseTrigger />
