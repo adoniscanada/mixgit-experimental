@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  AlertDialog,
   Button,
   Card,
   ComboBox,
@@ -13,10 +14,13 @@ import {
   Spinner,
   Surface,
   ToggleButton,
+  useOverlayState,
 } from "@heroui/react";
 import {
+  ArrowDownTrayIcon,
   InformationCircleIcon,
   SparklesIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import ReactMarkdown from "react-markdown";
 import { ScriptStack } from "./ScriptStack";
@@ -28,10 +32,12 @@ interface Props {
   aiFeedback: string | null;
   loadingFeedback: boolean;
   onGetFeedback: () => void;
+  onDeleteRemix: () => Promise<void>;
   hasSelectedRemix: boolean;
   remixName: string | null;
   remixDescription: string | null;
   feedbackTimestamp: string | null;
+  canDelete: boolean;
 }
 
 export function ScriptsPanel({
@@ -40,10 +46,12 @@ export function ScriptsPanel({
   aiFeedback,
   loadingFeedback,
   onGetFeedback,
+  onDeleteRemix,
+  hasSelectedRemix,
   remixName,
   remixDescription,
   feedbackTimestamp,
-  hasSelectedRemix,
+  canDelete,
 }: Props) {
   // isEmpty overrides the toggle, as empty projects should be viewed raw.
   const isEmpty = Object.keys(scripts).length === 0;
@@ -52,6 +60,23 @@ export function ScriptsPanel({
     Object.keys(scripts)[0] ?? "",
   );
   const targetScripts = scripts[selectedTarget] ?? [];
+
+  const deleteState = useOverlayState();
+  const [loading, setLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleDeleteRemix() {
+    setLoading(true);
+    setDeleteError(null);
+    try {
+      await onDeleteRemix();
+      deleteState.close();
+    } catch (e) {
+      setDeleteError(String(e));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4 flex-1 min-h-0">
@@ -168,6 +193,81 @@ export function ScriptsPanel({
               </Modal.Container>
             </Modal.Backdrop>
           </Modal>
+        )}
+        {raw && (
+          <Button
+            onPress={() => {
+              const blob = new Blob([raw], {
+                type: "application/json",
+              });
+
+              const url = URL.createObjectURL(blob);
+
+              const a = document.createElement("a");
+
+              a.href = url;
+              a.download = "project.json";
+              a.click();
+
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <ArrowDownTrayIcon />
+            Download
+          </Button>
+        )}
+        {hasSelectedRemix && (
+          <AlertDialog
+            isOpen={deleteState.isOpen}
+            onOpenChange={deleteState.setOpen}
+          >
+            <Button
+              variant="danger"
+              onPress={deleteState.open}
+              isDisabled={!canDelete}
+            >
+              <TrashIcon className="h-4 w-4" />
+              Delete
+            </Button>
+
+            <AlertDialog.Backdrop>
+              <AlertDialog.Container>
+                <AlertDialog.Dialog>
+                  <AlertDialog.CloseTrigger className="m-3" />
+
+                  <AlertDialog.Header>
+                    <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                      <AlertDialog.Icon />
+                      Delete Remix?
+                    </AlertDialog.Heading>
+                  </AlertDialog.Header>
+
+                  <AlertDialog.Body>
+                    <strong>{remixName}</strong> will be permanently deleted.
+                    This cannot be undone.
+                  </AlertDialog.Body>
+
+                  <AlertDialog.Footer>
+                    {deleteError && (
+                      <p className="text-sm text-red-500">{deleteError}</p>
+                    )}
+                    <Button variant="outline" onPress={deleteState.close}>
+                      Cancel
+                    </Button>
+
+                    <Button
+                      variant="danger"
+                      isDisabled={loading}
+                      onPress={handleDeleteRemix}
+                    >
+                      {loading && <Spinner size="sm" />}
+                      {loading ? "Deleting..." : "Delete"}
+                    </Button>
+                  </AlertDialog.Footer>
+                </AlertDialog.Dialog>
+              </AlertDialog.Container>
+            </AlertDialog.Backdrop>
+          </AlertDialog>
         )}
       </div>
       {isEmpty || isRawToggled ? (

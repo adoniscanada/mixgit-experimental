@@ -7,6 +7,7 @@ import {
   Button,
   Chip,
   Dropdown,
+  Header,
   Input,
   Spinner,
   Surface,
@@ -139,15 +140,18 @@ export function ProjectHeader({
                 </Dropdown.Trigger>
                 <Dropdown.Popover>
                   <Dropdown.Menu>
-                    {sortedTeam.slice(3).map((member) => (
-                      <Dropdown.Item
-                        key={member.id}
-                        target="_blank"
-                        href={`/users/${member.id}`}
-                      >
-                        {member.name}
-                      </Dropdown.Item>
-                    ))}
+                    <Dropdown.Section>
+                      <Header>Members</Header>
+                      {sortedTeam.slice(3).map((member) => (
+                        <Dropdown.Item
+                          key={member.id}
+                          target="_blank"
+                          href={`/users/${member.id}`}
+                        >
+                          {member.name}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Section>
                   </Dropdown.Menu>
                 </Dropdown.Popover>
               </Dropdown>
