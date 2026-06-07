@@ -99,7 +99,7 @@ export function ProjectHeader({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex justify-end items-end gap-2">
+        <div className="flex justify-between items-end">
           <div className="flex -space-x-2">
             {sortedTeam.slice(0, 3).map((member) => (
               <Link
@@ -170,7 +170,7 @@ export function ProjectHeader({
           </Popover>
         </div>
         {!isVisitor && (
-          <div className="flex gap-1">
+          <div className="flex justify-between items-end gap-1">
             <CreateRemixModal
               projectId={projectId}
               creatorId={creatorId}

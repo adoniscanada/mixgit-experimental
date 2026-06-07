@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
 import { ProjectHeader } from "./_components/ProjectHeader";
+import { Separator } from "@heroui/react";
 
 function formatTimestamp(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -93,6 +94,7 @@ export default async function ProjectPage({
           creatorName={creator?.name ?? ""}
           creatorColor={creator?.color ?? ""}
         />
+        <Separator />
         <ProjectContent
           creatorId={userId}
           userId={session.userId}
