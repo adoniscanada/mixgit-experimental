@@ -6,7 +6,9 @@ import {
   Button,
   Card,
   ComboBox,
+  Description,
   Input,
+  Label,
   ListBox,
   Modal,
   Popover,
@@ -57,7 +59,7 @@ export function ScriptsPanel({
   const isEmpty = Object.keys(scripts).length === 0;
   const [isRawToggled, setIsRawToggled] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState(
-    Object.keys(scripts)[0] ?? "",
+    Object.keys(scripts).find((name) => scripts[name].length > 0) ?? "",
   );
   const targetScripts = scripts[selectedTarget] ?? [];
 
@@ -88,29 +90,6 @@ export function ScriptsPanel({
         >
           Raw
         </ToggleButton>
-        {!isEmpty && (
-          <ComboBox
-            aria-label="Select target"
-            className="w-fit"
-            inputValue={selectedTarget}
-            onInputChange={(value) => setSelectedTarget(value)}
-          >
-            <ComboBox.InputGroup>
-              <Input placeholder="Search targets..." />
-              <ComboBox.Trigger />
-            </ComboBox.InputGroup>
-            <ComboBox.Popover>
-              <ListBox>
-                {Object.keys(scripts).map((name) => (
-                  <ListBox.Item key={name} textValue={name}>
-                    {name}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </ComboBox.Popover>
-          </ComboBox>
-        )}
         {hasSelectedRemix && (
           <Modal>
             <Modal.Trigger>
@@ -275,10 +254,48 @@ export function ScriptsPanel({
           {raw}
         </Surface>
       ) : (
-        <Surface className="flex flex-wrap gap-3 p-3 justify-around flex-1 min-h-0 overflow-auto bg-grid bg-local border rounded-lg">
-          {targetScripts.map((script) => (
-            <ScriptStack key={script.hatBlockId} script={script} />
-          ))}
+        <Surface className="flex-1 min-h-0 bg-grid bg-local border rounded-lg overflow-auto">
+          <div className="sticky top-0 z-10 p-3">
+            <ComboBox
+              aria-label="Select target"
+              variant="secondary"
+              className="w-fit"
+              isRequired
+              inputValue={selectedTarget}
+              onInputChange={(value) => setSelectedTarget(value)}
+            >
+              <ComboBox.InputGroup>
+                <Input placeholder="Search targets..." />
+                <ComboBox.Trigger />
+              </ComboBox.InputGroup>
+              <ComboBox.Popover>
+                <ListBox>
+                  {Object.keys(scripts).map((name) => (
+                    <ListBox.Item
+                      key={name}
+                      textValue={name}
+                      isDisabled={scripts[name].length === 0}
+                    >
+                      <div className="flex flex-col">
+                        <Label>{name}</Label>
+                        <Description>
+                          {scripts[name].length === 0
+                            ? "empty"
+                            : `${scripts[name].length} script${scripts[name].length !== 1 ? "s" : ""}`}
+                        </Description>
+                      </div>
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </ComboBox.Popover>
+            </ComboBox>
+          </div>
+          <div className="flex flex-wrap justify-around gap-3 p-3">
+            {targetScripts.map((script) => (
+              <ScriptStack key={script.hatBlockId} script={script} />
+            ))}
+          </div>
         </Surface>
       )}
     </div>
