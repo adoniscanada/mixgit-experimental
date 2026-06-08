@@ -70,6 +70,13 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
           minute: "2-digit",
         }),
       );
+    } catch {
+      setAiFeedback({
+        what_works_well: "",
+        suggestions: [],
+        logic_issues: [],
+        error: "Failed to get feedback. Please try again later.",
+      });
     } finally {
       setLoadingFeedback(false);
     }

@@ -9,4 +9,5 @@ export type AIFeedback = {
   what_works_well: string;
   suggestions: AIFeedbackTopic[];
   logic_issues: AIFeedbackTopic[];
+  error: string | undefined;
 };
