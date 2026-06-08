@@ -44,4 +44,5 @@ export const feedbackTool: Anthropic.Tool = {
     },
     required: ["what_works_well", "suggestions", "logic_issues"],
   },
+  cache_control: { type: "ephemeral" },
 };

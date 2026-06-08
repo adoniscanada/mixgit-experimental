@@ -20,7 +20,10 @@ export async function POST(req: NextRequest) {
     max_tokens: 700,
     tools: [feedbackTool],
     tool_choice: { type: "tool", name: "submit_feedback" },
-    system: `
+    system: [
+      {
+        type: "text",
+        text: `
     You are an export Scratch mentor for young learners.
     You are given the project.json file of a remix. 
     You provide constructive feedback that is friendly and enthusiastic.
@@ -28,6 +31,9 @@ export async function POST(req: NextRequest) {
     Your language can be understood by young learners, and you keep sentences consise.
     You do not include emojis in your feedback.
     `,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     messages: [
       {
         role: "user",
