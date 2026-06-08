@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { verifySession } from "@/lib/dal";
 import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
@@ -7,8 +6,8 @@ import UserModel from "@/models/User";
 import mongoose from "mongoose";
 import { notFound } from "next/navigation";
 import { ProjectContent, type RemixItem } from "./_components/ProjectContent";
-import { Separator } from "@heroui/react";
 import { ProjectHeader } from "./_components/ProjectHeader";
+import { Separator } from "@heroui/react";
 
 function formatTimestamp(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -32,7 +31,7 @@ export default async function ProjectPage({
   const { userId } = await params;
   const { projectId } = await searchParams;
 
-  await verifySession();
+  const session = await verifySession();
   await connectDB();
 
   // populate the "name" field from each User object in team for displaying Avatars
@@ -64,6 +63,7 @@ export default async function ProjectPage({
     name: remix.name,
     uploaderName: remix.uploader?.name ?? "Unknown",
     uploaderColor: remix.uploader?.color ?? "#808080",
+    uploaderId: remix.uploader._id.toString(),
     description: remix.description,
     isMain: remix.isMain,
     projectJsonData:
@@ -77,6 +77,7 @@ export default async function ProjectPage({
         <ProjectHeader
           projectId={project._id.toString()}
           creatorId={userId}
+          userId={session.userId}
           initialName={project.name}
           initialDescription={project.description ?? ""}
           createdAt={project.createdAt.toLocaleDateString("en-US", {
@@ -84,7 +85,7 @@ export default async function ProjectPage({
             day: "numeric",
             year: "numeric",
           })}
-          lastUpdated={serializedRemixes[0]?.createdAt}
+          lastUpdated={formatTimestamp(project.updatedAt)}
           team={project.team.map((m) => ({
             id: m._id.toString(),
             name: m.name,
@@ -93,8 +94,12 @@ export default async function ProjectPage({
           creatorName={creator?.name ?? ""}
           creatorColor={creator?.color ?? ""}
         />
-        <Separator></Separator>
-        <ProjectContent remixes={serializedRemixes} />
+        <Separator />
+        <ProjectContent
+          creatorId={userId}
+          userId={session.userId}
+          remixes={serializedRemixes}
+        />
       </main>
     </div>
   );
