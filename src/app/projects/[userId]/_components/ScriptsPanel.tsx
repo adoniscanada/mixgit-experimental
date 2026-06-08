@@ -85,11 +85,11 @@ export function ScriptsPanel({
 
   return (
     <div className="flex flex-col gap-4 flex-1 min-h-0">
-      <div className="flex gap-1 items-end">
+      <div className="flex flex-wrap gap-2 items-center">
         {hasSelectedRemix && (
           <Modal>
             <Modal.Trigger>
-              <Button>
+              <Button size="sm">
                 <SparklesIcon className="h-4 w-4" />
                 AI Feedback
               </Button>
@@ -270,7 +270,7 @@ export function ScriptsPanel({
           onChange={setIsRawToggled}
           isDisabled={isEmpty}
           size="sm"
-          className="ml-auto"
+          className="sm:ml-auto"
         >
           Raw
         </ToggleButton>
