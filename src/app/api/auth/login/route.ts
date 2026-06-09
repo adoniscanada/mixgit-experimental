@@ -14,12 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (rememberMe) {
-      console.log("Remember Me is enabled");
-    } else {
-      console.log("Remember Me is disabled");
-    }
-
     const authResponse = await auth.api.signInEmail({
       body: {
         email,

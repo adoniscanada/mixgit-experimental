@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Form, Input, Label, TextField, Checkbox } from "@heroui/react";
 import Link from "next/link";
@@ -110,13 +110,19 @@ export default function LoginPage() {
             </div>
           </TextField>
 
-          <Checkbox className="flex items-center gap-2">
-            <Input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <Label className="text-sm">Remember me</Label>
+          <Checkbox
+            id="rememberMe"
+            isSelected={rememberMe}
+            onChange={setRememberMe}
+          >
+            <Checkbox.Control>
+              <Checkbox.Indicator />
+            </Checkbox.Control>
+            <Checkbox.Content>
+              <Label htmlFor="rememberMe" className="text-sm text-black">
+                Remember Me
+              </Label>
+            </Checkbox.Content>
           </Checkbox>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
