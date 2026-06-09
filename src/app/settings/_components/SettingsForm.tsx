@@ -83,7 +83,7 @@ export default function SettingsForm({
 
     setLoading(true);
     try {
-      const res = await fetch("/api/users/me", {
+      const res = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -145,7 +145,7 @@ export default function SettingsForm({
     setPasswordLoading(true);
 
     try {
-      const response = await fetch("/api/users/me/password", {
+      const response = await fetch("/api/user/password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -188,7 +188,7 @@ export default function SettingsForm({
     setDeleteLoading(true);
 
     try {
-      const response = await fetch("/api/users/me/delete", {
+      const response = await fetch("/api/user/delete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -334,15 +334,19 @@ export default function SettingsForm({
             <Modal.Dialog>
               <Modal.CloseTrigger />
 
-              <Modal.Header>
+              <Modal.Header className="px-3">
                 <Modal.Heading>Change Password</Modal.Heading>
               </Modal.Header>
 
               <Modal.Body>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3 px-2">
                   <TextField
                     value={currentPassword}
-                    onChange={setCurrentPassword}
+                    onChange={(value) => {
+                      setCurrentPassword(value);
+                      setPasswordError(null);
+                    }}
+                    className="py-1"
                   >
                     <Input
                       type="password"
@@ -351,7 +355,14 @@ export default function SettingsForm({
                     />
                   </TextField>
 
-                  <TextField value={newPassword} onChange={setNewPassword}>
+                  <TextField
+                    value={newPassword}
+                    onChange={(value) => {
+                      setNewPassword(value);
+                      setPasswordError(null);
+                    }}
+                    className="py-1"
+                  >
                     <Input
                       type="password"
                       variant="secondary"
@@ -361,7 +372,11 @@ export default function SettingsForm({
 
                   <TextField
                     value={confirmPassword}
-                    onChange={setConfirmPassword}
+                    onChange={(value) => {
+                      setConfirmPassword(value);
+                      setPasswordError(null);
+                    }}
+                    className="py-1"
                   >
                     <Input
                       type="password"
@@ -400,19 +415,26 @@ export default function SettingsForm({
             <Modal.Dialog>
               <Modal.CloseTrigger />
 
-              <Modal.Header>
+              <Modal.Header className="px-2">
                 <Modal.Heading>Delete Account</Modal.Heading>
               </Modal.Header>
 
               <Modal.Body>
-                <div className="flex flex-col gap-3">
-                  <TextField>
+                <div className="flex flex-col gap-3 px-2">
+                  <p className="text-sm text-red-500">
+                    This action cannot be undone.
+                  </p>
+
+                  <TextField className="py-1">
                     <Input
                       type="password"
                       variant="secondary"
                       placeholder="Enter Password To Confirm"
                       value={deletePassword}
-                      onChange={(e) => setDeletePassword(e.target.value)}
+                      onChange={(e) => {
+                        setDeletePassword(e.target.value);
+                        setDeleteError(null);
+                      }}
                     />
                   </TextField>
 

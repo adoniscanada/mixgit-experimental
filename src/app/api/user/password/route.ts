@@ -1,58 +1,35 @@
-import { verifySession } from "@/lib/dal";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
-const ChangePasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8),
-});
-
-export async function PATCH(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    await verifySession();
-
     const body = await request.json();
 
-    const result = ChangePasswordSchema.safeParse(body);
-
-    if (!result.success) {
-      return NextResponse.json(
-        {
-          error: result.error.flatten().fieldErrors,
-        },
-        {
-          status: 400,
-        },
-      );
-    }
+    const { currentPassword, newPassword } = body;
 
     await auth.api.changePassword({
-      headers: await headers(),
+      headers: request.headers,
       body: {
-        currentPassword: result.data.currentPassword,
-        newPassword: result.data.newPassword,
+        currentPassword,
+        newPassword,
       },
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-      },
-      {
-        status: 200,
-      },
-    );
-  } catch (error) {
+    return NextResponse.json({
+      success: true,
+    });
+  } catch (error: unknown) {
     console.error("Change password error:", error);
+
+    const message =
+      error instanceof Error ? error.message : "Failed to change password";
 
     return NextResponse.json(
       {
-        error: "Failed to update password",
+        error: message,
       },
       {
-        status: 500,
+        status: 400,
       },
     );
   }
