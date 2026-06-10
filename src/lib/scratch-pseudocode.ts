@@ -71,7 +71,8 @@ function blockToLine(block: Block, blockMap: BlockMap): string {
         const nested = blockMap[input.blockId];
         if (!nested) return `${key}=[ ]`;
         if (nested.shadow) {
-          // Shadow blocks are dropdown menus so render their field value directly
+          // Shadow blocks are dropdown menus so return their field value directly
+          // e.g. returns Cat Flying1 instead of touchingobjectmenu(TOUCHINGOBJECTMENU=Cat1 Flying)
           const values = Object.values(nested.fields).map((f) => f[0]);
           return `${key}=${values.join(" ") || "[ ]"}`;
         }
@@ -95,17 +96,24 @@ export function rawToPseudocode(raw: string): string {
       const blockMap = blockMaps[targetName];
       const target = project.targets.find((t) => t.name === targetName);
 
-      pseudocode += `Target: ${targetName}\n${
-        target?.variables && Object.values(target.variables).length > 0
-          ? `${target?.isStage ? "global" : "local"} variables=[${Object.values(
-              target.variables,
-            )
-              .map((v) => `${v[0]}=${v[1]}`)
-              .join(", ")}]\n`
-          : ""
-      }`;
+      pseudocode += `Target: ${targetName}\n`;
+
+      if (target?.variables && Object.values(target.variables).length > 0) {
+        pseudocode += `${target?.isStage ? "Global" : "Local"} variables: [${Object.values(
+          target.variables,
+        )
+          .map((v) => `${v[0]}=${v[1]}`)
+          .join(", ")}]\n`;
+      }
+
+      if (target?.costumes && Object.values(target.costumes).length > 0) {
+        pseudocode += `Costumes: [${Object.values(target.costumes)
+          .map((c) => c.name)
+          .join(", ")}]\n`;
+      }
+
       if (targetScripts.length === 0) {
-        pseudocode += "(no scripts)\n\n";
+        pseudocode += "No scripts\n\n";
         continue;
       } else {
         for (const script of targetScripts) {
