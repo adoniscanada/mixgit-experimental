@@ -1,75 +1,59 @@
 import { verifySession } from "@/lib/dal";
 import connectDB from "@/lib/db";
-import User from "@/models/User";
-import mongoose from "mongoose";
+import { UserProfileSchema } from "@/lib/schemas/user.zod";
+import UserModel from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-const UpdateProfileSchema = z.object({
-  name: z.string().trim().min(1).max(50),
-});
 
 export async function PATCH(request: NextRequest) {
   try {
     const session = await verifySession();
-
-    await connectDB();
-
     const body = await request.json();
 
-    const result = UpdateProfileSchema.safeParse(body);
+    const result = UserProfileSchema.safeParse({
+      name: body.name,
+      color: body.color,
+      about: body.about ?? "",
+    });
 
     if (!result.success) {
       return NextResponse.json(
-        {
-          error: result.error.flatten().fieldErrors,
-        },
-        {
-          status: 400,
-        },
+        { error: z.flattenError(result.error).fieldErrors },
+        { status: 400 },
       );
     }
 
-    const user = await User.findByIdAndUpdate(
-      new mongoose.Types.ObjectId(session.userId),
+    await connectDB();
+
+    const user = await UserModel.findByIdAndUpdate(
+      session.userId,
       {
         name: result.data.name,
+        color: result.data.color,
+        about: result.data.about,
       },
-      {
-        new: true,
-      },
-    );
+      { returnDocument: "after" },
+    ).lean();
 
     if (!user) {
-      return NextResponse.json(
-        {
-          error: "User not found",
-        },
-        {
-          status: 404,
-        },
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        user,
+    return NextResponse.json({
+      user: {
+        id: session.userId,
+        name: user.name,
+        email: user.email,
+        color: user.color,
+        about: user.about ?? "",
       },
-      {
-        status: 200,
-      },
-    );
+    });
   } catch (error) {
-    console.error("Update profile error:", error);
+    console.error("Profile update error:", error);
 
     return NextResponse.json(
-      {
-        error: "Failed to update profile",
-      },
-      {
-        status: 500,
-      },
+      { error: "Failed to update profile" },
+      { status: 500 },
     );
   }
 }
