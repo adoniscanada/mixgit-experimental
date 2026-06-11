@@ -204,7 +204,7 @@ export default function SettingsForm({
         throw new Error(data.error || "Failed to delete account");
       }
 
-      window.location.href = "/login";
+      router.push("/");
     } catch (err) {
       setDeleteError(
         err instanceof Error ? err.message : "Failed to delete account",
@@ -329,6 +329,7 @@ export default function SettingsForm({
       </Form>
 
       <Modal state={passwordState}>
+        <Modal.Trigger className="sr-only" tabIndex={-1} />
         <Modal.Backdrop variant="blur">
           <Modal.Container>
             <Modal.Dialog>
@@ -413,6 +414,7 @@ export default function SettingsForm({
       </Modal>
 
       <Modal state={deleteState}>
+        <Modal.Trigger className="sr-only" tabIndex={-1} />
         <Modal.Backdrop variant="blur">
           <Modal.Container>
             <Modal.Dialog>
@@ -428,7 +430,10 @@ export default function SettingsForm({
                     This action cannot be undone.
                   </p>
 
-                  <TextField className="py-1">
+                  <TextField
+                    className="py-1"
+                    aria-label="Password to confirm deletion"
+                  >
                     <Input
                       type="password"
                       variant="secondary"
