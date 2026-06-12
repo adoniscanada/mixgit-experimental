@@ -204,7 +204,7 @@ export default function SettingsForm({
         throw new Error(data.error || "Failed to delete account");
       }
 
-      window.location.href = "/login";
+      router.push("/");
     } catch (err) {
       setDeleteError(
         err instanceof Error ? err.message : "Failed to delete account",
@@ -246,11 +246,11 @@ export default function SettingsForm({
         <div className="flex flex-col gap-2">
           <Label>Avatar color</Label>
           <div className="flex items-center gap-3">
-            <input
+            <Input
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className="h-10 w-14 cursor-pointer rounded border border-default-200 bg-transparent"
+              className="h-9 w-9 p-0 cursor-pointer rounded border border-default-200 bg-transparent"
               aria-label="Pick avatar color"
             />
             <Input
@@ -305,7 +305,7 @@ export default function SettingsForm({
           </div>
         </div>
 
-        <div className="min-h-[24px]">
+        <div className="min-h-6">
           {profileError && (
             <p className="text-sm text-red-500">{profileError}</p>
           )}
@@ -329,6 +329,7 @@ export default function SettingsForm({
       </Form>
 
       <Modal state={passwordState}>
+        <Modal.Trigger className="sr-only" tabIndex={-1} />
         <Modal.Backdrop variant="blur">
           <Modal.Container>
             <Modal.Dialog>
@@ -347,6 +348,7 @@ export default function SettingsForm({
                       setPasswordError(null);
                     }}
                     className="py-1"
+                    aria-label="Current Password"
                   >
                     <Input
                       type="password"
@@ -362,6 +364,7 @@ export default function SettingsForm({
                       setPasswordError(null);
                     }}
                     className="py-1"
+                    aria-label="New password"
                   >
                     <Input
                       type="password"
@@ -377,6 +380,7 @@ export default function SettingsForm({
                       setPasswordError(null);
                     }}
                     className="py-1"
+                    aria-label="Confirm new password"
                   >
                     <Input
                       type="password"
@@ -410,6 +414,7 @@ export default function SettingsForm({
       </Modal>
 
       <Modal state={deleteState}>
+        <Modal.Trigger className="sr-only" tabIndex={-1} />
         <Modal.Backdrop variant="blur">
           <Modal.Container>
             <Modal.Dialog>
@@ -425,7 +430,10 @@ export default function SettingsForm({
                     This action cannot be undone.
                   </p>
 
-                  <TextField className="py-1">
+                  <TextField
+                    className="py-1"
+                    aria-label="Password to confirm deletion"
+                  >
                     <Input
                       type="password"
                       variant="secondary"

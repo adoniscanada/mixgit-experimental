@@ -8,8 +8,6 @@ const protectedRoutes = [
   "/settings",
 ];
 
-const authRoutes = ["/login", "/signup"];
-
 // proxy function that runs on each request to check auth state and redirects accordingly
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -18,7 +16,10 @@ export function proxy(request: NextRequest) {
     pathname.startsWith(route),
   );
 
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isAuthRoute =
+    pathname === "/" ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup");
 
   const sessionCookie =
     request.cookies.get("better-auth.session_token") ??
@@ -27,7 +28,7 @@ export function proxy(request: NextRequest) {
   const isAuthenticated = !!sessionCookie;
 
   if (isProtectedRoute && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+    return NextResponse.redirect(new URL("/", request.nextUrl));
   }
 
   if (isAuthRoute && isAuthenticated) {
