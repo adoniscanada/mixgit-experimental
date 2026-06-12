@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   try {
     message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 1400,
+      max_tokens: 3500,
       tools: [feedbackTool],
       tool_choice: { type: "tool", name: "submit_feedback" },
       system: FEEDBACK_SYSTEM,
