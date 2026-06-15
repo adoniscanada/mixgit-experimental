@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AlertDialog,
   Button,
@@ -23,6 +23,8 @@ import {
 } from "@heroui/react";
 import {
   ArrowDownTrayIcon,
+  CodeBracketIcon,
+  ExclamationTriangleIcon,
   InformationCircleIcon,
   SparklesIcon,
   TrashIcon,
@@ -30,6 +32,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { ScriptStack } from "./ScriptStack";
 import type { Script, AIFeedback } from "@/types";
+import { rawToPseudocode } from "@/lib/scratch-pseudocode";
 
 interface Props {
   raw: string | undefined;
@@ -61,6 +64,7 @@ export function ScriptsPanel({
   // isEmpty overrides the toggle, as empty projects should be viewed raw.
   const isEmpty = Object.keys(scripts).length === 0;
   const [isRawToggled, setIsRawToggled] = useState(false);
+  const [isPseudocodeToggled, setIsPseudocodeToggled] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState(
     Object.keys(scripts).find((name) => scripts[name].length > 0) ?? "",
   );
@@ -82,6 +86,15 @@ export function ScriptsPanel({
       setLoading(false);
     }
   }
+
+  const pseudocode = useMemo(() => {
+    if (!raw) return "";
+    try {
+      return rawToPseudocode(raw);
+    } catch {
+      return "";
+    }
+  }, [raw]);
 
   return (
     <div className="flex flex-col gap-4 flex-1 min-h-0">
@@ -120,17 +133,16 @@ export function ScriptsPanel({
                       ) : (
                         <Card variant="secondary">
                           <Card.Content className="overflow-auto">
-                            <div className="">
-                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                <h4>What Works Well</h4>
+                            <div>
+                              <div className="text-sm prose prose-h4:text-md prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none mb-4">
                                 <ReactMarkdown>
                                   {aiFeedback.what_works_well}
                                 </ReactMarkdown>
                               </div>
+                              <h2 className="font-bold">
+                                Suggestions and Logic Issues
+                              </h2>
                               <div>
-                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                  <h4>Suggestions</h4>
-                                </div>
                                 <DisclosureGroup>
                                   {aiFeedback.suggestions.map(
                                     (suggestion, i) => {
@@ -140,8 +152,7 @@ export function ScriptsPanel({
                                             <Disclosure.Heading>
                                               <Button
                                                 slot="trigger"
-                                                variant="secondary"
-                                                className="flex bg-transparent justify-between"
+                                                className="flex bg-transparent justify-between text-foreground "
                                                 fullWidth
                                               >
                                                 {suggestion.title}
@@ -150,17 +161,18 @@ export function ScriptsPanel({
                                             </Disclosure.Heading>
                                             <Disclosure.Content>
                                               <Disclosure.Body>
-                                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                                <div className="text-sm text-muted prose prose-h4:text-md prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
                                                   <ReactMarkdown>
                                                     {suggestion.detail}
                                                   </ReactMarkdown>
                                                 </div>
                                                 <Button
+                                                  variant="tertiary"
                                                   size="sm"
                                                   className="mt-4"
                                                 >
                                                   <SparklesIcon />
-                                                  Remix
+                                                  Generate Remix
                                                 </Button>
                                               </Disclosure.Body>
                                             </Disclosure.Content>
@@ -170,13 +182,7 @@ export function ScriptsPanel({
                                       );
                                     },
                                   )}
-                                </DisclosureGroup>
-                              </div>
-                              <div>
-                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                  <h4>Logic Issues</h4>
-                                </div>
-                                <DisclosureGroup>
+
                                   {aiFeedback.logic_issues.map((issue, i) => {
                                     return (
                                       <div key={i}>
@@ -184,27 +190,30 @@ export function ScriptsPanel({
                                           <Disclosure.Heading>
                                             <Button
                                               slot="trigger"
-                                              variant="secondary"
-                                              className="flex bg-transparent justify-between"
+                                              className="flex bg-transparent justify-between text-danger"
                                               fullWidth
                                             >
-                                              {issue.title}
+                                              <div className="flex gap-2 items-center">
+                                                {issue.title}
+                                                <ExclamationTriangleIcon />
+                                              </div>
                                               <Disclosure.Indicator />
                                             </Button>
                                           </Disclosure.Heading>
                                           <Disclosure.Content>
                                             <Disclosure.Body>
-                                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                              <div className="text-sm text-muted prose prose-h4:text-md prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
                                                 <ReactMarkdown>
                                                   {issue.detail}
                                                 </ReactMarkdown>
                                               </div>
                                               <Button
+                                                variant="tertiary"
                                                 size="sm"
                                                 className="mt-4"
                                               >
                                                 <SparklesIcon />
-                                                Remix
+                                                Generate Remix
                                               </Button>
                                             </Disclosure.Body>
                                           </Disclosure.Content>
@@ -360,46 +369,74 @@ export function ScriptsPanel({
       ) : (
         <Surface className="flex-1 min-h-0 bg-grid bg-local border rounded-lg overflow-auto">
           <div className="sticky top-0 z-10 p-3">
-            <ComboBox
-              aria-label="Select target"
-              variant="secondary"
-              className="w-fit"
-              isRequired
-              inputValue={selectedTarget}
-              onInputChange={(value) => setSelectedTarget(value)}
-            >
-              <ComboBox.InputGroup>
-                <Input placeholder="Search targets..." />
-                <ComboBox.Trigger />
-              </ComboBox.InputGroup>
-              <ComboBox.Popover>
-                <ListBox>
-                  {Object.keys(scripts).map((name) => (
-                    <ListBox.Item
-                      key={name}
-                      textValue={name}
-                      isDisabled={scripts[name].length === 0}
-                    >
-                      <div className="flex flex-col">
-                        <Label>{name}</Label>
-                        <Description>
-                          {scripts[name].length === 0
-                            ? "empty"
-                            : `${scripts[name].length} script${scripts[name].length !== 1 ? "s" : ""}`}
-                        </Description>
-                      </div>
-                      <ListBox.ItemIndicator />
-                    </ListBox.Item>
-                  ))}
-                </ListBox>
-              </ComboBox.Popover>
-            </ComboBox>
+            <div className="flex gap-2">
+              {!isPseudocodeToggled && (
+                <ComboBox
+                  aria-label="Select target"
+                  variant="secondary"
+                  className="w-fit"
+                  isRequired
+                  inputValue={selectedTarget}
+                  onInputChange={(value) => setSelectedTarget(value)}
+                >
+                  <ComboBox.InputGroup>
+                    <Input placeholder="Search targets..." />
+                    <ComboBox.Trigger />
+                  </ComboBox.InputGroup>
+                  <ComboBox.Popover>
+                    <ListBox>
+                      {Object.keys(scripts).map((name) => (
+                        <ListBox.Item
+                          key={name}
+                          textValue={name}
+                          isDisabled={scripts[name].length === 0}
+                        >
+                          <div className="flex flex-col">
+                            <Label>{name}</Label>
+                            <Description>
+                              {scripts[name].length === 0
+                                ? "empty"
+                                : `${scripts[name].length} script${scripts[name].length !== 1 ? "s" : ""}`}
+                            </Description>
+                          </div>
+                          <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                      ))}
+                    </ListBox>
+                  </ComboBox.Popover>
+                </ComboBox>
+              )}
+              <ToggleButton
+                isSelected={isPseudocodeToggled}
+                onChange={setIsPseudocodeToggled}
+                size="sm"
+                isIconOnly
+                className="sm:ml-auto"
+              >
+                <CodeBracketIcon />
+              </ToggleButton>
+            </div>
           </div>
-          <div className="flex flex-wrap justify-around gap-3 p-3">
-            {targetScripts.map((script) => (
-              <ScriptStack key={script.hatBlockId} script={script} />
-            ))}
-          </div>
+          {isPseudocodeToggled ? (
+            <div className="p-3">
+              <Card variant="secondary">
+                <Card.Content>
+                  <code className="whitespace-pre-wrap">{pseudocode}</code>
+                </Card.Content>
+              </Card>
+            </div>
+          ) : (
+            <div className="columns-[280px] gap-3 p-3">
+              {targetScripts.map((script) => (
+                <div
+                  key={script.hatBlockId}
+                  className="break-inside-avoid justify-self-center mb-3"
+                >
+                  <ScriptStack script={script} />
+                </div>
+              ))}
+            </div>
+          )}
         </Surface>
       )}
     </div>
