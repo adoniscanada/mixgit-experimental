@@ -276,19 +276,19 @@ export default function SettingsForm({
         <Label>Profile Picture</Label>
 
         <div className="flex flex-col items-start gap-3">
-          <button
+          <Button
             type="button"
-            onClick={() => setImageModalOpen(true)}
-            className="cursor-pointer border-0 bg-transparent p-0"
+            onPress={() => setImageModalOpen(true)}
+            variant="primary"
+            className="h-auto min-w-0 p-0 bg-transparent hover:bg-transparent"
           >
             <Avatar size="lg" className="h-28 w-28 rounded-3xl">
-              {imagePath && <Avatar.Image src={imageUrl} alt={name} />}
-
+              {imagePath && <Avatar.Image src={imageUrl!} alt={name} />}
               <Avatar.Fallback style={{ backgroundColor: color }}>
                 {avatarInitial}
               </Avatar.Fallback>
             </Avatar>
-          </button>
+          </Button>
 
           <div className="flex gap-2">
             <Button
@@ -309,7 +309,7 @@ export default function SettingsForm({
           </div>
         </div>
 
-        <input
+        <Input
           id="avatar-upload"
           type="file"
           accept="image/*"
@@ -434,6 +434,7 @@ export default function SettingsForm({
       </Form>
 
       <Modal isOpen={imageModalOpen} onOpenChange={setImageModalOpen}>
+        <Modal.Trigger className="sr-only" tabIndex={-1} />
         <Modal.Backdrop variant="blur">
           <Modal.Container>
             <Modal.Dialog>

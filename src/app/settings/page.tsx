@@ -31,8 +31,8 @@ export default async function SettingsPage() {
         <SettingsForm
           userId={session.userId}
           initialName={user.name}
-          initialColor={user.color}
-          initialAbout={user.about}
+          initialColor={user.color ?? "#808080"}
+          initialAbout={user.about ?? ""}
           initialImagePath={user.imagePath ?? ""}
         />
       </main>
