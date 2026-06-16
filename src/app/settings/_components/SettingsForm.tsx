@@ -270,6 +270,33 @@ export default function SettingsForm({
     }
   }
 
+  async function handleRemoveProfileImage() {
+    setProfileError(null);
+
+    try {
+      const response = await fetch("/api/user/avatar", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imagePath: null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove image");
+      }
+
+      setImagePath("");
+      setSelectedFile(null);
+      setImageModalOpen(false);
+      router.refresh();
+    } catch {
+      setProfileError("Failed to remove image");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -278,13 +305,18 @@ export default function SettingsForm({
         <div className="flex flex-col items-start gap-3">
           <Button
             type="button"
-            onPress={() => setImageModalOpen(true)}
+            onPress={() => {
+              if (imagePath) setImageModalOpen(true);
+            }}
             variant="primary"
-            className="h-auto min-w-0 p-0 bg-transparent hover:bg-transparent"
+            className={`h-auto min-w-0 p-0 bg-transparent hover:bg-transparent ${!imagePath ? "cursor-default" : "cursor-pointer"}`}
           >
             <Avatar size="lg" className="h-28 w-28 rounded-3xl">
-              {imagePath && <Avatar.Image src={imageUrl!} alt={name} />}
-              <Avatar.Fallback style={{ backgroundColor: color }}>
+              <Avatar.Image src={imageUrl} alt={name} />
+              <Avatar.Fallback
+                style={{ backgroundColor: color }}
+                className="text-2xl"
+              >
                 {avatarInitial}
               </Avatar.Fallback>
             </Avatar>
@@ -348,24 +380,26 @@ export default function SettingsForm({
           />
         </TextField>
 
-        <div className="flex flex-col gap-2">
-          <Label>Avatar color</Label>
-          <div className="flex items-center gap-3">
-            <Input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-9 w-9 p-0 cursor-pointer rounded border border-default-200 bg-transparent"
-              aria-label="Pick avatar color"
-            />
-            <Input
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              placeholder="#808080"
-              className="flex-1"
-            />
+        {!imagePath && (
+          <div>
+            <Label>Avatar color</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="h-9 w-9 p-0 cursor-pointer rounded border border-default-200 bg-transparent"
+                aria-label="Pick avatar color"
+              />
+              <Input
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                placeholder="#808080"
+                className="flex-1"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <TextField>
           <Label>About me</Label>
@@ -449,6 +483,18 @@ export default function SettingsForm({
                   />
                 )}
               </Modal.Body>
+
+              <Modal.Footer>
+                {imagePath && (
+                  <Button
+                    variant="danger-soft"
+                    size="sm"
+                    onPress={handleRemoveProfileImage}
+                  >
+                    Remove Picture
+                  </Button>
+                )}
+              </Modal.Footer>
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>
