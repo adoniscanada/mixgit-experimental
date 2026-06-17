@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import connectDB from "./db";
 
@@ -60,6 +61,8 @@ export const auth = betterAuth({
       sameSite: "lax",
     },
   },
+
+  plugins: [username()],
 
   rememberMe: {
     enabled: true,

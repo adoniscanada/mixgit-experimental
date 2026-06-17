@@ -31,6 +31,7 @@ import { ProjectSchema } from "@/lib/schemas/project.zod";
 interface TeamMember {
   id: string;
   name: string;
+  username?: string;
   color: string;
   imagePath?: string;
 }
@@ -38,6 +39,7 @@ interface TeamMember {
 interface ProjectHeaderProps {
   projectId: string;
   creatorId: string;
+  creatorUsername: string;
   userId: string | undefined;
   initialName: string;
   initialDescription: string;
@@ -52,6 +54,7 @@ interface ProjectHeaderProps {
 export function ProjectHeader({
   projectId,
   creatorId,
+  creatorUsername,
   userId,
   initialName,
   initialDescription,
@@ -87,6 +90,7 @@ export function ProjectHeader({
     {
       id: creatorId,
       name: creatorName,
+      username: creatorUsername,
       color: creatorColor,
       imagePath: creatorImagePath,
     },
@@ -218,7 +222,7 @@ export function ProjectHeader({
               <Link
                 key={member.id}
                 target="_blank"
-                href={`/users/${member.id}`}
+                href={`/${member.username ?? member.id}`}
               >
                 <Tooltip delay={0}>
                   <Tooltip.Trigger>
@@ -261,7 +265,7 @@ export function ProjectHeader({
                         <Dropdown.Item
                           key={member.id}
                           target="_blank"
-                          href={`/users/${member.id}`}
+                          href={`/${member.username ?? member.id}`}
                         >
                           {member.name}
                         </Dropdown.Item>

@@ -94,9 +94,16 @@ export default function AddCollaboratorModal({
 
   return (
     <Modal state={state}>
-      <Button isIconOnly isDisabled={isDisabled} variant="secondary" size="sm">
-        <UsersIcon />
-      </Button>
+      <Modal.Trigger>
+        <Button
+          isIconOnly
+          isDisabled={isDisabled}
+          variant="secondary"
+          size="sm"
+        >
+          <UsersIcon />
+        </Button>
+      </Modal.Trigger>
       <Modal.Backdrop>
         <Modal.Container size="md">
           <Modal.Dialog>
