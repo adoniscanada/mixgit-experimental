@@ -40,6 +40,7 @@ interface ProjectHeaderProps {
   projectId: string;
   creatorId: string;
   creatorUsername: string;
+  slug: string;
   userId: string | undefined;
   initialName: string;
   initialDescription: string;
@@ -55,6 +56,7 @@ export function ProjectHeader({
   projectId,
   creatorId,
   creatorUsername,
+  slug,
   userId,
   initialName,
   initialDescription,
@@ -123,10 +125,16 @@ export function ProjectHeader({
       });
 
       if (res.ok) {
+        const data = await res.json();
         savedRef.current = { name, description };
+
+        if (data.slug && data.slug !== slug) {
+          router.push(`/${creatorUsername}/${data.slug}`);
+        }
       } else {
         const { error } = await res.json().catch(() => ({}));
         setSaveError(typeof error === "string" ? error : "Failed to save");
+        setName(savedRef.current.name);
       }
     } catch {
       setSaveError("Failed to save");

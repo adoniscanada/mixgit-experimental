@@ -109,6 +109,7 @@ export default async function ProjectPage({
           }))}
           creatorName={creator.name ?? ""}
           creatorUsername={creator.username ?? ""}
+          slug={project.slug}
           creatorColor={creator.color ?? ""}
           creatorImagePath={creator.imagePath ?? undefined}
         />
