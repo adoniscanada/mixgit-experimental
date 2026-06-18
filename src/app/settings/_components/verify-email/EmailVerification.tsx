@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Modal, useOverlayState } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 
@@ -9,12 +9,35 @@ type EmailVerificationProps = {
   state: ReturnType<typeof useOverlayState>;
 };
 
+type Session = {
+  user?: {
+    emailVerified?: boolean;
+  };
+};
+
 export default function EmailVerification({
   email,
   state,
 }: EmailVerificationProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    async function loadSession() {
+      try {
+        const res = await authClient.getSession();
+        setSession(res?.data ?? null);
+      } catch {
+        setMessage("Failed to load session.");
+      }
+    }
+
+    loadSession();
+  }, []);
+
+  const isVerified = session?.user?.emailVerified;
 
   async function handleResendVerification() {
     if (!email) return;
@@ -26,7 +49,7 @@ export default function EmailVerification({
       await authClient.sendVerificationEmail({ email });
 
       setMessage("Verification email sent. Check your inbox.");
-    } catch (err) {
+    } catch {
       setMessage("Failed to send verification email.");
     } finally {
       setLoading(false);
@@ -50,9 +73,16 @@ export default function EmailVerification({
               <div className="flex flex-col gap-6 justify-center items-center text-center p-4 w-full text-black">
                 <p>Email: {email}</p>
 
-                <Button isDisabled={loading} onPress={handleResendVerification}>
-                  {loading ? "Verifying..." : "Verify Account"}
-                </Button>
+                {isVerified ? (
+                  <Button isDisabled>✓ Email Verified</Button>
+                ) : (
+                  <Button
+                    isDisabled={loading}
+                    onPress={handleResendVerification}
+                  >
+                    {loading ? "Sending..." : "Didn't receive email? Resend"}
+                  </Button>
+                )}
 
                 {message && (
                   <p className="text-sm text-default-500">{message}</p>
