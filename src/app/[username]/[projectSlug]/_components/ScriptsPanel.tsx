@@ -23,7 +23,9 @@ import {
 } from "@heroui/react";
 import {
   ArrowDownTrayIcon,
+  ExclamationTriangleIcon,
   InformationCircleIcon,
+  LightBulbIcon,
   SparklesIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -120,62 +122,19 @@ export function ScriptsPanel({
                       ) : (
                         <Card variant="secondary">
                           <Card.Content className="overflow-auto">
-                            <div className="">
-                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                <h4>What Works Well</h4>
+                            <div>
+                              <h4 className="text-base font-semibold">
+                                What Works Well
+                              </h4>
+                              <div className="text-sm prose prose-code:before:content-none prose-code:after:content-none">
                                 <ReactMarkdown>
                                   {aiFeedback.what_works_well}
                                 </ReactMarkdown>
                               </div>
+                              <h4 className="text-base font-semibold mt-2">
+                                Issues & Suggestions
+                              </h4>
                               <div>
-                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                  <h4>Suggestions</h4>
-                                </div>
-                                <DisclosureGroup>
-                                  {aiFeedback.suggestions.map(
-                                    (suggestion, i) => {
-                                      return (
-                                        <div key={i}>
-                                          <Disclosure>
-                                            <Disclosure.Heading>
-                                              <Button
-                                                slot="trigger"
-                                                variant="secondary"
-                                                className="flex bg-transparent justify-between"
-                                                fullWidth
-                                              >
-                                                {suggestion.title}
-                                                <Disclosure.Indicator />
-                                              </Button>
-                                            </Disclosure.Heading>
-                                            <Disclosure.Content>
-                                              <Disclosure.Body>
-                                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                                  <ReactMarkdown>
-                                                    {suggestion.detail}
-                                                  </ReactMarkdown>
-                                                </div>
-                                                <Button
-                                                  size="sm"
-                                                  className="mt-4"
-                                                >
-                                                  <SparklesIcon />
-                                                  Remix
-                                                </Button>
-                                              </Disclosure.Body>
-                                            </Disclosure.Content>
-                                          </Disclosure>
-                                          <Separator />
-                                        </div>
-                                      );
-                                    },
-                                  )}
-                                </DisclosureGroup>
-                              </div>
-                              <div>
-                                <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
-                                  <h4>Logic Issues</h4>
-                                </div>
                                 <DisclosureGroup>
                                   {aiFeedback.logic_issues.map((issue, i) => {
                                     return (
@@ -185,27 +144,29 @@ export function ScriptsPanel({
                                             <Button
                                               slot="trigger"
                                               variant="secondary"
-                                              className="flex bg-transparent justify-between"
+                                              className="flex bg-transparent justify-between text-danger"
                                               fullWidth
                                             >
-                                              {issue.title}
+                                              <div className="flex w-full items-center justify-start gap-2">
+                                                <ExclamationTriangleIcon />
+                                                {issue.title}
+                                              </div>
                                               <Disclosure.Indicator />
                                             </Button>
                                           </Disclosure.Heading>
                                           <Disclosure.Content>
                                             <Disclosure.Body>
-                                              <div className="text-sm prose prose-h4:mb-0 prose-code:font-family:monospace prose-code:before:content-none prose-code:after:content-none">
+                                              <div className="text-sm prose prose-code:before:content-none prose-code:after:content-none">
                                                 <ReactMarkdown>
                                                   {issue.detail}
                                                 </ReactMarkdown>
                                               </div>
-                                              <Button
-                                                size="sm"
-                                                className="mt-4"
-                                              >
-                                                <SparklesIcon />
-                                                Remix
-                                              </Button>
+                                              <div className="flex flex-col items-center">
+                                                <Button className="mt-2">
+                                                  <SparklesIcon />
+                                                  Generate Remix
+                                                </Button>
+                                              </div>
                                             </Disclosure.Body>
                                           </Disclosure.Content>
                                         </Disclosure>
@@ -213,6 +174,46 @@ export function ScriptsPanel({
                                       </div>
                                     );
                                   })}
+                                  {aiFeedback.suggestions.map(
+                                    (suggestion, i) => {
+                                      return (
+                                        <div key={i}>
+                                          <Disclosure>
+                                            <Disclosure.Heading>
+                                              <Button
+                                                slot="trigger"
+                                                variant="secondary"
+                                                className="flex bg-transparent justify-between text-foreground"
+                                                fullWidth
+                                              >
+                                                <div className="flex w-full items-center justify-start gap-2">
+                                                  <LightBulbIcon />
+                                                  {suggestion.title}
+                                                </div>
+                                                <Disclosure.Indicator />
+                                              </Button>
+                                            </Disclosure.Heading>
+                                            <Disclosure.Content>
+                                              <Disclosure.Body>
+                                                <div className="text-sm prose prose-code:before:content-none prose-code:after:content-none">
+                                                  <ReactMarkdown>
+                                                    {suggestion.detail}
+                                                  </ReactMarkdown>
+                                                </div>
+                                                <div className="flex flex-col items-center">
+                                                  <Button className="mt-2">
+                                                    <SparklesIcon />
+                                                    Generate Remix
+                                                  </Button>
+                                                </div>
+                                              </Disclosure.Body>
+                                            </Disclosure.Content>
+                                          </Disclosure>
+                                          <Separator />
+                                        </div>
+                                      );
+                                    },
+                                  )}
                                 </DisclosureGroup>
                               </div>
                             </div>
