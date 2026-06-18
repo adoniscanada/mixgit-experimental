@@ -50,7 +50,7 @@ export default function EmailVerification({
 
       setMessage("Verification email sent. Check your inbox.");
     } catch {
-      setMessage("Failed to send verification email.");
+      setMessage("Email not found.");
     } finally {
       setLoading(false);
     }
@@ -74,13 +74,13 @@ export default function EmailVerification({
                 <p>Email: {email}</p>
 
                 {isVerified ? (
-                  <Button isDisabled>✓ Email Verified</Button>
+                  <Button isDisabled>Email Verified</Button>
                 ) : (
                   <Button
                     isDisabled={loading}
                     onPress={handleResendVerification}
                   >
-                    {loading ? "Sending..." : "Didn't receive email? Resend"}
+                    {loading ? "Sending..." : "Verify Email"}
                   </Button>
                 )}
 
