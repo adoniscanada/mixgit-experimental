@@ -163,7 +163,7 @@ export default function Signup() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="text-sm"
+                    className="text-sm rounded-tl-[inherit] rounded-bl-[inherit]"
                   />
                   <InputGroup.Suffix className="pr-0">
                     <Button
