@@ -14,6 +14,7 @@ export type RemixItem = {
   name: string;
   uploaderName: string;
   uploaderId: string;
+  uploaderUsername: string;
   uploaderColor: string;
   uploaderImagePath?: string;
   description: string;
@@ -62,7 +63,6 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       const data = await res.json();
       if (!res.ok) {
         setAiFeedback({
-          analysis: "",
           what_works_well: "",
           suggestions: [],
           logic_issues: [],
@@ -81,7 +81,6 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
       );
     } catch {
       setAiFeedback({
-        analysis: "",
         what_works_well: "",
         suggestions: [],
         logic_issues: [],
@@ -146,8 +145,8 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                     </Avatar.Fallback>
                   </Avatar>
                   <Card.Header className="flex flex-row flex-1 items-center justify-between">
-                    <Badge.Anchor>
-                      <Card.Title className="pe-3">
+                    <Badge.Anchor className="shrink">
+                      <Card.Title className="pe-3 line-clamp-1">
                         {remix.name}
                         {remix.isMain && (
                           <Popover>
@@ -174,7 +173,9 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                         )}
                       </Card.Title>
                     </Badge.Anchor>
-                    <Card.Description>{remix.createdAt}</Card.Description>
+                    <Card.Description className="shrink-0">
+                      {remix.createdAt}
+                    </Card.Description>
                   </Card.Header>
                 </div>
                 <Card.Content>
@@ -228,7 +229,7 @@ export function ProjectContent({ creatorId, userId, remixes }: Props) {
                 {selectedRemix.createdAt} by{" "}
                 <Link
                   target="_blank"
-                  href={`/users/${selectedRemix.uploaderId}`}
+                  href={`/users/${selectedRemix.uploaderUsername}`}
                 >
                   {selectedRemix.uploaderName}
                   <Link.Icon />

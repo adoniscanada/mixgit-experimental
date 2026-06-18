@@ -1,7 +1,10 @@
 import { betterAuth } from "better-auth";
+import { username } from "better-auth/plugins";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import connectDB from "./db";
 import { resend } from "@/lib/resend";
+import ProjectModel from "@/models/Project";
+import mongoose from "mongoose";
 
 // Establish MongoDB connection once the module loads
 const conn = await connectDB();
@@ -74,9 +77,34 @@ export const auth = betterAuth({
     },
   },
 
+  plugins: [username()],
+
   rememberMe: {
     enabled: true,
     maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            await connectDB();
+            await ProjectModel.updateOne(
+              {
+                _id: new mongoose.Types.ObjectId("6a32deb0d811a1a70783102e"),
+                creator: new mongoose.Types.ObjectId(
+                  "6a179622ed55953a60a86130",
+                ),
+              },
+              { $addToSet: { team: user.id } },
+            );
+          } catch (err) {
+            console.error("Failed to add user to onboarding project:", err);
+          }
+        },
+      },
+    },
   },
 
   // JWT token configuration

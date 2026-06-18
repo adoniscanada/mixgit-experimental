@@ -16,6 +16,7 @@ import {
   useOverlayState,
 } from "@heroui/react";
 import { ProjectSchema } from "@/lib/schemas/project.zod";
+import { generateSlug } from "@/lib/slugify";
 import { useRouter } from "next/navigation";
 
 // Confirmation button that show on the Modal and submits the Form inputs
@@ -52,6 +53,10 @@ export default function CreateProjectModal() {
       });
 
       if (res.ok) {
+        setName("");
+        setDescription("");
+        setSubmitted(false);
+        setError(null);
         state.close();
         router.refresh();
       } else {
@@ -77,16 +82,14 @@ export default function CreateProjectModal() {
             <Modal.CloseTrigger className="m-2" />
             <Modal.Header>
               <Modal.Heading className="text-2xl">
-                New Scratchpad Project
+                New MixGit Project
               </Modal.Heading>
             </Modal.Header>
             <Modal.Body>
               <Form
                 className="flex flex-col gap-4 p-1"
                 validationBehavior="aria"
-                onSubmit={(e) => {
-                  handleSubmit(e);
-                }}
+                onSubmit={handleSubmit}
               >
                 <TextField
                   isRequired
@@ -105,14 +108,15 @@ export default function CreateProjectModal() {
                   <Label>Title</Label>
                   <Input
                     variant="secondary"
-                    placeholder='"My Awesome Scratchpad Project!"'
+                    placeholder='"My Awesome MixGit Project!"'
                     aria-label="Project title"
                   />
-                  <Description>
-                    Choose a unique name for your project
-                  </Description>
+                  {name.trim() && (
+                    <Description>URL: /{generateSlug(name)}</Description>
+                  )}
                   <FieldError />
                 </TextField>
+
                 <TextField
                   name="description"
                   value={description}

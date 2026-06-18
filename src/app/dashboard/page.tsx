@@ -1,6 +1,7 @@
 import { verifySession } from "@/lib/dal";
 import connectDB from "@/lib/db";
 import ProjectModel from "@/models/Project";
+import UserModel from "@/models/User";
 import mongoose from "mongoose";
 import ProjectList from "./_components/ProjectList";
 import CreateProjectModal from "./_components/CreateProjectModal";
@@ -9,6 +10,9 @@ export default async function DashboardPage() {
   const session = await verifySession();
 
   await connectDB();
+
+  const user = await UserModel.findById(session.userId).lean();
+
   const projects = await ProjectModel.find({
     creator: new mongoose.Types.ObjectId(session.userId),
   })
@@ -18,6 +22,7 @@ export default async function DashboardPage() {
   const serialized = projects.map((p) => ({
     id: p._id.toString(),
     name: p.name,
+    slug: p.slug,
     description: p.description ?? "",
     createdAt: new Date(p.createdAt).toLocaleDateString("en-US", {
       month: "short",
@@ -32,13 +37,16 @@ export default async function DashboardPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold">
-              Your Scratchpad Projects
+              Your MixGit Projects
             </h1>
             <p className="text-sm mt-1">Create and manage your Projects</p>
           </div>
           <CreateProjectModal />
         </div>
-        <ProjectList projects={serialized} userId={session.userId} />
+        <ProjectList
+          projects={serialized}
+          username={user?.username ?? session.userId}
+        />
       </main>
     </div>
   );
