@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Modal, useOverlayState } from "@heroui/react";
+import { authClient } from "@/lib/auth-client";
 
 type EmailVerificationProps = {
   email: string;
@@ -22,20 +23,10 @@ export default function EmailVerification({
       setLoading(true);
       setMessage("");
 
-      const res = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!res.ok) {
-        throw new Error();
-      }
+      await authClient.sendVerificationEmail({ email });
 
       setMessage("Verification email sent. Check your inbox.");
-    } catch {
+    } catch (err) {
       setMessage("Failed to send verification email.");
     } finally {
       setLoading(false);
