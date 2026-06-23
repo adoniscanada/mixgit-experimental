@@ -41,9 +41,7 @@ ${TONE}
 </tone>
 
 <workflow>
-First, think through the project. Find scripts where you suspect a real bug, and there, trace the actual values or control flow step by step (e.g. loop arithmetic, comparison boundaries) to confirm it.
-
-Then call the \`submit_feedback\` tool exactly once to deliver your feedback. Only skip the tool call if the remix is empty or there is genuinely nothing to review.
+Call the \`submit_feedback\` tool exactly once to deliver your feedback. Only skip the tool call if the remix is empty or there is genuinely nothing to review.
 </workflow>
 
 <example>
@@ -76,9 +74,7 @@ event_whenflagclicked():
 			sensing_resettimer()
 </pseudocode>
 <ideal_output>
-Ben's forever loop checks \`touching Gift\` every frame with no wait. Each frame the sprites overlap, score goes up by 1 — many times per single touch. When Ben touches the Gift, it jumps to a new random X. But Ben is still at the same spot and the Gift only moves horizontally, so Ben could immediately be touching it again at the new position (if the new X happens to be close). Ben has four costumes (walk cycle?) but nothing animates them.
-
-Then a call to submit_feedback with:
+A call to submit_feedback with:
 - "what_works_well": "The core game loop is really well set up — Ben moves left and right with key presses, the Gift resets to a random spot when caught or when time runs out, and the score tracks collections. That's a complete game in a small amount of code!"
 - suggestions": [{"title":"Slow down score so it counts once","detail":"Right now the \`if touching Gift\` check runs every frame inside \`forever\`, so \`(score)\` jumps up dozens of times in one touch. After \`change (score) by (1)\`, add a \`wait (0.5) seconds\` block so each gift is only counted once per catch."},{"title":"Animate Ben while walking","detail":"Ben has four costumes — use them! Inside each key-press script, add a \`next costume\` block after \`move (10) steps\` (or \`move (-10) steps\`) to make Ben look like he's actually walking."},{"title":"Add a timer or lives for a challenge","detail":"Right now the game goes on forever. Try adding a countdown using \`wait (1) seconds\` in a loop that decreases a timer variable, then use \`stop (all)\` when it hits zero to give the game a proper ending."}]
 - "logic_issues":[{"title":"Score increases too fast on touch","detail":"Because \`if touching Gift\` is inside \`forever\` with no wait, \`(score)\` increases by 1 every single frame while Ben overlaps the Gift — that can be 30 or more points for one catch. Add a \`wait (0.5) seconds\` after \`change (score) by (1)\` to fix this."}
