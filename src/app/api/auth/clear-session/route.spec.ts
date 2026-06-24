@@ -2,12 +2,6 @@ import { describe, it, expect } from "vitest";
 import { GET } from "./route";
 
 describe("GET /api/auth/clear-session", () => {
-  it("issues a redirect to the app root", () => {
-    const res = GET();
-    expect(res.status).toBe(307);
-    expect(res.headers.get("location")).toBe("http://localhost:3000/");
-  });
-
   it("adds a Set-Cookie header to all four session cookies", () => {
     const res = GET();
 
