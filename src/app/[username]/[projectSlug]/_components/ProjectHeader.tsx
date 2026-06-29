@@ -26,6 +26,7 @@ import {
   InformationCircleIcon,
   TagIcon,
   UserMinusIcon,
+  MinusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { ProjectSchema, PROJECT_TAGS } from "@/lib/schemas/project.zod";
@@ -147,15 +148,10 @@ export function ProjectHeader({
     }
   }
 
-  async function handleAddTag(tag: string) {
-    if (tags.includes(tag)) return;
-
-    const updatedTags = [...tags, tag];
-
-    if (updatedTags.length > 3) return;
+  async function updateTags(updatedTags: string[]) {
+    const previous = tags;
 
     setTags(updatedTags);
-    setIsTagMenuOpen(false);
 
     try {
       const res = await fetch(`/api/projects/${projectId}`, {
@@ -171,10 +167,10 @@ export function ProjectHeader({
       });
 
       if (!res.ok) {
-        setTags(tags);
+        setTags(previous);
       }
     } catch {
-      setTags(tags);
+      setTags(previous);
     }
   }
 
@@ -261,12 +257,32 @@ export function ProjectHeader({
 
           <div className="flex flex-wrap gap-1 px-1 mt-1">
             {tags.map((tag) => (
-              <Chip key={tag} size="md" variant="secondary">
-                {tag}
+              <Chip key={tag} size="md" variant="secondary" className="group">
+                <div className="flex items-center gap-1">
+                  <span>{tag}</span>
+
+                  {userId === creatorId && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void updateTags(tags.filter((t) => t !== tag))
+                      }
+                      className="
+                        opacity-0
+                        group-hover:opacity-100
+                        transition-opacity
+                        duration-150
+                      "
+                      aria-label={`Remove ${tag}`}
+                    >
+                      <MinusCircleIcon className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </Chip>
             ))}
 
-            {userId === creatorId && (
+            {userId === creatorId && tags.length < 3 && (
               <Dropdown isOpen={isTagMenuOpen} onOpenChange={setIsTagMenuOpen}>
                 <Dropdown.Trigger>
                   <Chip
@@ -290,7 +306,10 @@ export function ProjectHeader({
                         (tag) => (
                           <Dropdown.Item
                             key={tag}
-                            onAction={() => handleAddTag(tag)}
+                            onAction={() => {
+                              setIsTagMenuOpen(false);
+                              void updateTags([...tags, tag]);
+                            }}
                           >
                             {tag}
                           </Dropdown.Item>
