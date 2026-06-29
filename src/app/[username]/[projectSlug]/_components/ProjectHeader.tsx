@@ -228,7 +228,7 @@ export function ProjectHeader({
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1 px-1 mt-1">
               {tags.map((tag) => (
-                <Chip key={tag} size="sm" variant="secondary">
+                <Chip key={tag} size="md" variant="secondary">
                   {tag}
                 </Chip>
               ))}
