@@ -69,8 +69,9 @@ export function ProjectHeader({
   creatorName,
   creatorColor,
   creatorImagePath,
-  tags,
+  tags: initialTags,
 }: ProjectHeaderProps) {
+  const [tags, setTags] = useState(initialTags);
   const [name, setName] = useState(initialName);
   const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
   const [description, setDescription] = useState(initialDescription);
@@ -143,6 +144,37 @@ export function ProjectHeader({
       }
     } catch {
       setSaveError("Failed to save");
+    }
+  }
+
+  async function handleAddTag(tag: string) {
+    if (tags.includes(tag)) return;
+
+    const updatedTags = [...tags, tag];
+
+    if (updatedTags.length > 3) return;
+
+    setTags(updatedTags);
+    setIsTagMenuOpen(false);
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          tags: updatedTags,
+        }),
+      });
+
+      if (!res.ok) {
+        setTags(tags);
+      }
+    } catch {
+      setTags(tags);
     }
   }
 
@@ -254,9 +286,16 @@ export function ProjectHeader({
                     <Dropdown.Section>
                       <Header>Select a tag</Header>
 
-                      {PROJECT_TAGS.map((tag) => (
-                        <Dropdown.Item key={tag}>{tag}</Dropdown.Item>
-                      ))}
+                      {PROJECT_TAGS.filter((tag) => !tags.includes(tag)).map(
+                        (tag) => (
+                          <Dropdown.Item
+                            key={tag}
+                            onAction={() => handleAddTag(tag)}
+                          >
+                            {tag}
+                          </Dropdown.Item>
+                        ),
+                      )}
                     </Dropdown.Section>
                   </Dropdown.Menu>
                 </Dropdown.Popover>
