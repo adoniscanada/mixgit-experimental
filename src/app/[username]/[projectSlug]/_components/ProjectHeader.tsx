@@ -7,6 +7,7 @@ import {
   Avatar,
   Button,
   ButtonGroup,
+  Chip,
   Dropdown,
   FieldError,
   Header,
@@ -23,10 +24,12 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CreateRemixModal from "./CreateRemixModal";
 import {
   InformationCircleIcon,
+  TagIcon,
   UserMinusIcon,
+  MinusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { ProjectSchema } from "@/lib/schemas/project.zod";
+import { ProjectSchema, PROJECT_TAGS } from "@/lib/schemas/project.zod";
 
 interface TeamMember {
   id: string;
@@ -50,6 +53,7 @@ interface ProjectHeaderProps {
   creatorName: string;
   creatorColor: string;
   creatorImagePath?: string;
+  tags: string[];
 }
 
 export function ProjectHeader({
@@ -66,8 +70,11 @@ export function ProjectHeader({
   creatorName,
   creatorColor,
   creatorImagePath,
+  tags: initialTags,
 }: ProjectHeaderProps) {
+  const [tags, setTags] = useState(initialTags);
   const [name, setName] = useState(initialName);
+  const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
   const [description, setDescription] = useState(initialDescription);
   const [loading, setLoading] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
@@ -138,6 +145,32 @@ export function ProjectHeader({
       }
     } catch {
       setSaveError("Failed to save");
+    }
+  }
+
+  async function updateTags(updatedTags: string[]) {
+    const previous = tags;
+
+    setTags(updatedTags);
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          tags: updatedTags,
+        }),
+      });
+
+      if (!res.ok) {
+        setTags(previous);
+      }
+    } catch {
+      setTags(previous);
     }
   }
 
@@ -221,6 +254,66 @@ export function ProjectHeader({
           {saveError && (
             <p className="text-xs text-red-500 px-1">{saveError}</p>
           )}
+
+          <div className="flex flex-wrap gap-1 px-1">
+            {tags.map((tag) => (
+              <Chip key={tag} size="md" variant="secondary">
+                <Chip.Label>{tag}</Chip.Label>
+
+                {userId === creatorId && (
+                  <Button
+                    isIconOnly
+                    variant="tertiary"
+                    size="md"
+                    className="h-4! w-4! min-h-0! my-0"
+                    onPress={() =>
+                      void updateTags(tags.filter((t) => t !== tag))
+                    }
+                    aria-label={`Remove ${tag}`}
+                  >
+                    <MinusCircleIcon className="h-4 w-4 text-gray-600" />
+                  </Button>
+                )}
+              </Chip>
+            ))}
+
+            {userId === creatorId && tags.length < 3 && (
+              <Dropdown isOpen={isTagMenuOpen} onOpenChange={setIsTagMenuOpen}>
+                <Dropdown.Trigger className="flex items-center">
+                  <Chip
+                    size="md"
+                    variant="secondary"
+                    className="cursor-pointer h-6"
+                  >
+                    <Chip.Label>Add Tag</Chip.Label>
+                    <TagIcon width={16} />
+                  </Chip>
+                </Dropdown.Trigger>
+
+                <Dropdown.Popover>
+                  <Dropdown.Menu>
+                    <Dropdown.Section>
+                      <Header>Select a tag</Header>
+
+                      {PROJECT_TAGS.filter((tag) => !tags.includes(tag)).map(
+                        (tag) => (
+                          <Dropdown.Item
+                            key={tag}
+                            onAction={() => {
+                              setIsTagMenuOpen(false);
+                              void updateTags([...tags, tag]);
+                            }}
+                          >
+                            {tag}
+                          </Dropdown.Item>
+                        ),
+                      )}
+                    </Dropdown.Section>
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex flex-col gap-2 sm:items-end">
@@ -303,87 +396,92 @@ export function ProjectHeader({
         </div>
         {!isVisitor && (
           <div className="flex justify-between items-end gap-1">
-            <CreateRemixModal
-              projectId={projectId}
-              creatorId={creatorId}
-            ></CreateRemixModal>
-            <ButtonGroup>
-              {userId === creatorId && (
-                <AddCollaboratorModal
-                  projectId={projectId}
-                  creatorId={creatorId}
-                  isDisabled={userId !== creatorId}
-                  teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
-                  onMemberAdded={handleMemberAdded}
-                  onMemberRemoved={handleMemberRemoved}
-                />
-              )}
-              {userId !== creatorId && (
-                <AlertDialog
-                  isOpen={leaveState.isOpen}
-                  onOpenChange={leaveState.setOpen}
-                >
-                  <Button
-                    isIconOnly
-                    onPress={leaveState.open}
-                    variant="secondary"
-                    size="sm"
+            <CreateRemixModal projectId={projectId} creatorId={creatorId} />
+
+            <div className="flex items-center gap-1">
+              <ButtonGroup>
+                {userId === creatorId && (
+                  <AddCollaboratorModal
+                    projectId={projectId}
+                    creatorId={creatorId}
+                    isDisabled={userId !== creatorId}
+                    teamIds={[creatorId, ...liveTeam.map((m) => m.id)]}
+                    onMemberAdded={handleMemberAdded}
+                    onMemberRemoved={handleMemberRemoved}
+                  />
+                )}
+
+                {userId !== creatorId && (
+                  <AlertDialog
+                    isOpen={leaveState.isOpen}
+                    onOpenChange={leaveState.setOpen}
                   >
-                    <ButtonGroup.Separator />
-                    <UserMinusIcon />
-                  </Button>
+                    <Button
+                      isIconOnly
+                      onPress={leaveState.open}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      <ButtonGroup.Separator />
+                      <UserMinusIcon />
+                    </Button>
 
-                  <AlertDialog.Backdrop>
-                    <AlertDialog.Container>
-                      <AlertDialog.Dialog>
-                        <AlertDialog.CloseTrigger className="m-3" />
+                    <AlertDialog.Backdrop>
+                      <AlertDialog.Container>
+                        <AlertDialog.Dialog>
+                          <AlertDialog.CloseTrigger className="m-3" />
 
-                        <AlertDialog.Header>
-                          <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
-                            <AlertDialog.Icon />
-                            Leave Project?
-                          </AlertDialog.Heading>
-                        </AlertDialog.Header>
+                          <AlertDialog.Header>
+                            <AlertDialog.Heading className="flex items-center gap-2 text-2xl mb-3">
+                              <AlertDialog.Icon />
+                              Leave Project?
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
 
-                        <AlertDialog.Body>
-                          {team.length === 0 ? (
-                            <p>
-                              <strong>{name}</strong> will be permanently
-                              deleted. This cannot be undone.
-                            </p>
-                          ) : (
-                            <p>
-                              You will no longer be able to contribute to this
-                              project.
-                            </p>
-                          )}
-                          {leaveError && (
-                            <p className="text-red-500 text-sm mt-2">
-                              {leaveError}
-                            </p>
-                          )}
-                        </AlertDialog.Body>
+                          <AlertDialog.Body>
+                            {team.length === 0 ? (
+                              <p>
+                                <strong>{name}</strong> will be permanently
+                                deleted. This cannot be undone.
+                              </p>
+                            ) : (
+                              <p>
+                                You will no longer be able to contribute to this
+                                project.
+                              </p>
+                            )}
 
-                        <AlertDialog.Footer>
-                          <Button variant="tertiary" onPress={leaveState.close}>
-                            Cancel
-                          </Button>
+                            {leaveError && (
+                              <p className="text-red-500 text-sm mt-2">
+                                {leaveError}
+                              </p>
+                            )}
+                          </AlertDialog.Body>
 
-                          <Button
-                            variant="danger"
-                            isDisabled={loading}
-                            onPress={handleLeaveProject}
-                          >
-                            {loading && <Spinner size="sm" />}
-                            {loading ? "Leaving..." : "Leave"}
-                          </Button>
-                        </AlertDialog.Footer>
-                      </AlertDialog.Dialog>
-                    </AlertDialog.Container>
-                  </AlertDialog.Backdrop>
-                </AlertDialog>
-              )}
-            </ButtonGroup>
+                          <AlertDialog.Footer>
+                            <Button
+                              variant="tertiary"
+                              onPress={leaveState.close}
+                            >
+                              Cancel
+                            </Button>
+
+                            <Button
+                              variant="danger"
+                              isDisabled={loading}
+                              onPress={handleLeaveProject}
+                            >
+                              {loading && <Spinner size="sm" />}
+                              {loading ? "Leaving..." : "Leave"}
+                            </Button>
+                          </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                      </AlertDialog.Container>
+                    </AlertDialog.Backdrop>
+                  </AlertDialog>
+                )}
+              </ButtonGroup>
+            </div>
           </div>
         )}
       </div>

@@ -43,6 +43,7 @@ export default async function UserProfilePage({
     name: p.name,
     slug: p.slug,
     description: p.description ?? "",
+    tags: p.tags ?? [],
     createdAt: formatDate(p.createdAt),
     createdAtRaw: p.createdAt.toISOString(),
   }));
